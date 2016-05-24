@@ -46,12 +46,12 @@ abstract class AbstractHttpClient implements HttpClient {
      * Implements the logic to make an actual request with an HTTP client library.
      *
      * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
+     * @param entity An {@link HttpEntity} containing the response body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     protected
-    abstract HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException
+    abstract HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException
 
     /**
      * Execute an HTTP request with the given method and request parameters and without a request entity.
@@ -80,32 +80,32 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
-     * Executes an HTTP request with the given method, request parameters, and input stream.
+     * Executes an HTTP request with the given method, request parameters, and entity.
      *
      * @param method HTTP method to use with the HTTP request.
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse execute(HttpMethod method, HttpRequest request, InputStream inputStream) throws IOException {
-        return run(method, request, inputStream)
+    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException {
+        return run(method, request, entity)
     }
 
     /**
-     * Executes an HTTP request with the given method, closure to configure the request, and input stream.
+     * Executes an HTTP request with the given method, closure to configure the request, and entity.
      *
      * @param method HTTP method to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse execute(HttpMethod method, InputStream inputStream,
+    HttpResponse execute(HttpMethod method, HttpEntity entity,
                          @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(method, HttpRequest.build(requestClosure), inputStream)
+        return execute(method, HttpRequest.build(requestClosure), entity)
     }
 
     /**
@@ -123,7 +123,7 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(method, request, converterManager.write(request, entity))
+        return execute(method, request, converterManager.write(entity, request.getContentType(), request.getCharset()))
     }
 
     /**
@@ -194,29 +194,29 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
-     * Perform an HTTP POST request with the given input stream.
+     * Perform an HTTP POST request with the given entity.
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse post(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.POST, request, inputStream)
+    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException {
+        return execute(HttpMethod.POST, request, entity)
     }
 
     /**
-     * Perform an HTTP POST request with the given input stream.
+     * Perform an HTTP POST request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse post(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.POST, inputStream, requestClosure)
+    HttpResponse post(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.POST, entity, requestClosure)
     }
 
     /**
@@ -279,29 +279,29 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
-     * Perform an HTTP PUT request with the given input stream..
+     * Perform an HTTP PUT request with the given entity..
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse put(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.PUT, request, inputStream)
+    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException {
+        return execute(HttpMethod.PUT, request, entity)
     }
 
     /**
-     * Perform an HTTP PUT request with the given input stream.
+     * Perform an HTTP PUT request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse put(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.PUT, inputStream, requestClosure)
+    HttpResponse put(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.PUT, entity, requestClosure)
     }
 
     /**
@@ -388,29 +388,29 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
-     * Perform an HTTP OPTIONS request with the given input stream.
+     * Perform an HTTP OPTIONS request with the given entity.
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse options(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.OPTIONS, request, inputStream)
+    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException {
+        return execute(HttpMethod.OPTIONS, request, entity)
     }
 
     /**
-     * Perform an HTTP OPTIONS request with the given input stream.
+     * Perform an HTTP OPTIONS request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    HttpResponse options(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.OPTIONS, inputStream, requestClosure)
+    HttpResponse options(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.OPTIONS, entity, requestClosure)
     }
 
     /**
@@ -550,21 +550,21 @@ abstract class AbstractHttpClient implements HttpClient {
      * @param entity Request entity.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      */
-    protected HttpResponse run(HttpMethod method, HttpRequest request, InputStream entity) {
+    protected HttpResponse run(HttpMethod method, HttpRequest request, HttpEntity entity) {
         HttpContext context = new HttpContext()
         context.setMethod(method)
 
         // Requests whose client contains a retry filter must have their entity buffered.
         // If it is not, the retried request will either throw an error due to the entity
         // input stream being closed, or the entity will not actually transmit. So, requests
-        // that could potentially be retried are automatically read into a ByteArrayInputStream
-        // so that it can be transmitted more than once.
+        // that could potentially be retried are automatically bufferedso that it can be
+        // transmitted more than once.
         if (entity != null && filterManager.hasRetryFilters()) {
-            entity = new ByteArrayInputStream(StreamUtils.readBytes(entity))
+            entity.buffer()
         }
 
         while (true) {
-            if (entity != null && entity.markSupported()) {
+            if (entity != null && entity.isBuffered()) {
                 entity.reset()
             }
 

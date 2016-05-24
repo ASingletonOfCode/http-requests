@@ -72,17 +72,17 @@ class MockHttpClient extends AbstractHttpClient {
      * Implements the logic to make an actual request with an HTTP client library.
      *
      * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
+     * @param entity An {@link HttpEntity} containing the response body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         httpContext = context
 
-        if (inputStream) {
+        if (entity) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            transmit(inputStream, filterOutputStream(context, outputStream))
+            transmit(entity, filterOutputStream(context, outputStream))
             requestBuffer = outputStream.toByteArray()
         }
 

@@ -16,7 +16,7 @@
 package com.budjb.httprequests.converter
 
 import com.budjb.httprequests.EntityInputStream
-import com.budjb.httprequests.HttpRequest
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
 
@@ -102,38 +102,38 @@ class EntityConverterManager {
     }
 
     /**
-     * Attempts to convert the given entity into an {@link InputStream}. If an entity writer is successful,
-     * the content type for the conversion is set in the request, if a content type is available.
+     * Attempts to convert the given entity into an {@link HttpEntity}.
      *
-     * @param request HTTP request properties.
      * @param entity Entity object to convert.
-     * @return Converted entity as an InputStream.
+     * @param contentType Content-Type of the entity. Can be <code>null</code>.
+     * @param charset Character set to encode the entity with. Can be <code>null</code>.
+     * @return Converted entity as an HttpEntity.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    InputStream write(HttpRequest request, Object entity) throws UnsupportedConversionException {
+    HttpEntity write(Object entity, String contentType, String charset) throws UnsupportedConversionException {
         Class<?> type = entity.getClass()
 
+        if (!charset) {
+            charset = HttpEntity.DEFAULT_CHARACTER_SET
+        }
+
         for (EntityWriter writer : getEntityWriters()) {
-            if (writer.supports(type)) {
-                try {
-                    InputStream inputStream = writer.write(entity, request.getCharset())
-
-                    if (inputStream == null) {
-                        continue
-                    }
-
-                    if (request.getContentType() == null) {
-                        String contentType = writer.getContentType()
-                        if (contentType) {
-                            log.trace("applying Content-Type '${contentType}' to the request")
-                            request.setContentType(contentType)
-                        }
-                    }
-                    return inputStream
+            try {
+                if (!writer.supports(type)) {
+                    continue
                 }
-                catch (Exception e) {
-                    log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
+
+                InputStream inputStream = writer.write(entity, charset)
+
+                if (inputStream != null) {
+                    if (!contentType) {
+                        contentType = writer.getContentType()
+                    }
+                    return new HttpEntity(inputStream, contentType, charset)
                 }
+            }
+            catch (Exception e) {
+                log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
             }
         }
 

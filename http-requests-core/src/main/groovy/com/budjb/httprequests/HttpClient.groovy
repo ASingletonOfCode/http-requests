@@ -63,26 +63,26 @@ interface HttpClient {
     HttpResponse execute(HttpMethod method, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Executes an HTTP request with the given method, request parameters, and input stream.
+     * Executes an HTTP request with the given method, request parameters, and entity.
      *
      * @param method HTTP method to use with the HTTP request.
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse execute(HttpMethod method, HttpRequest request, InputStream inputStream) throws IOException
+    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException
 
     /**
-     * Executes an HTTP request with the given method, closure to configure the request, and input stream.
+     * Executes an HTTP request with the given method, closure to configure the request, and entity.
      *
      * @param method HTTP method to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse execute(HttpMethod method, InputStream inputStream,
+    HttpResponse execute(HttpMethod method, HttpEntity entity,
                          @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
@@ -153,24 +153,24 @@ interface HttpClient {
     HttpResponse post(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP POST request with the given input stream.
+     * Perform an HTTP POST request with the given entity.
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse post(HttpRequest request, InputStream inputStream) throws IOException
+    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException
 
     /**
-     * Perform an HTTP POST request with the given input stream.
+     * Perform an HTTP POST request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse post(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
+    HttpResponse post(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP POST request with the given entity.
@@ -220,24 +220,24 @@ interface HttpClient {
     HttpResponse put(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP PUT request with the given input stream..
+     * Perform an HTTP PUT request with the given entity.
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse put(HttpRequest request, InputStream inputStream) throws IOException
+    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException
 
     /**
-     * Perform an HTTP PUT request with the given input stream.
+     * Perform an HTTP PUT request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse put(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
+    HttpResponse put(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP PUT request with the given entity.
@@ -305,24 +305,24 @@ interface HttpClient {
     HttpResponse options(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP OPTIONS request with the given input stream.
+     * Perform an HTTP OPTIONS request with the given entity.
      *
      * @param request Request properties to use with the HTTP request.
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse options(HttpRequest request, InputStream inputStream) throws IOException
+    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException
 
     /**
-     * Perform an HTTP OPTIONS request with the given input stream.
+     * Perform an HTTP OPTIONS request with the given entity.
      *
-     * @param inputStream An {@link InputStream} containing the response body.
+     * @param entity An {@link HttpEntity} containing the response body.
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse options(InputStream entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
+    HttpResponse options(HttpEntity entity, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP OPTIONS request with the given entity.

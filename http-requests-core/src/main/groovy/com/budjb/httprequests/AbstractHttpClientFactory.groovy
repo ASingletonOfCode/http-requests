@@ -71,6 +71,7 @@ abstract class AbstractHttpClientFactory implements HttpClientFactory {
         addEntityConverter(new JsonEntityWriter())
         addEntityConverter(new FormDataEntityWriter())
         addEntityConverter(new XmlSlurperEntityReader())
+        addEntityConverter(new InputStreamWriter())
     }
 
     /**

@@ -1,26 +1,11 @@
-/*
- * Copyright 2016 Bud Byrd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.budjb.httprequests.converter.bundled
 
 import com.budjb.httprequests.converter.EntityWriter
 
 /**
- * An entity writer that converts a String.
+ * A basic writer that supports {@link InputStream}.
  */
-class StringEntityWriter implements EntityWriter {
+class InputStreamWriter implements EntityWriter {
     /**
      * Returns a Content-Type of the converted object that will be set in the HTTP request.
      *
@@ -30,7 +15,7 @@ class StringEntityWriter implements EntityWriter {
      */
     @Override
     String getContentType() {
-        return 'text/plain'
+        return null
     }
 
     /**
@@ -41,7 +26,7 @@ class StringEntityWriter implements EntityWriter {
      */
     @Override
     boolean supports(Class<?> type) {
-        return String.isAssignableFrom(type)
+        return InputStream.isAssignableFrom(type)
     }
 
     /**
@@ -56,14 +41,8 @@ class StringEntityWriter implements EntityWriter {
      */
     @Override
     InputStream write(Object entity, String characterSet) throws Exception {
-        if (entity instanceof String) {
-            if (characterSet) {
-                return new ByteArrayInputStream(entity.getBytes(characterSet))
-
-            }
-            else {
-                return new ByteArrayInputStream(entity.getBytes())
-            }
+        if (entity instanceof InputStream) {
+            return entity
         }
         return null
     }

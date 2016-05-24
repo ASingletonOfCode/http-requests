@@ -28,12 +28,12 @@ class ReferenceHttpClient extends AbstractHttpClient {
      * Implements the logic to make an actual request with an HTTP client library.
      *
      * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
+     * @param entity An {@link HttpEntity} containing the response body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
 
         URI uri = createURI(request)
@@ -59,7 +59,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
             }
         }
 
-        if (inputStream && request.getFullContentType()) {
+        if (entity && request.getFullContentType()) {
             connection.setRequestProperty('Content-Type', request.getFullContentType())
         }
 
@@ -67,20 +67,20 @@ class ReferenceHttpClient extends AbstractHttpClient {
             connection.setRequestProperty('Accept', request.getAccept())
         }
 
-        if (context.getMethod().isSupportsResponseEntity() && inputStream != null) {
+        if (context.getMethod().isSupportsResponseEntity() && entity != null) {
             connection.setDoInput(true)
         }
 
-        if (inputStream) {
+        if (entity) {
             if (context.getMethod().isSupportsRequestEntity()) {
                 connection.setDoOutput(true)
                 OutputStream outputStream = filterOutputStream(context, connection.getOutputStream())
-                StreamUtils.shovel(inputStream, outputStream)
-                inputStream.close()
+                StreamUtils.shovel(entity, outputStream)
+                entity.close()
                 outputStream.close()
             }
             else {
-                inputStream.close()
+                entity.close()
             }
         }
 
