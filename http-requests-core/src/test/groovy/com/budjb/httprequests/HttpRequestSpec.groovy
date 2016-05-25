@@ -48,9 +48,7 @@ class HttpRequestSpec extends Specification {
 
         when:
         request.setUri('http://localhost')
-            .setCharset('ISO-8859-8')
             .setAccept('text/plain')
-            .setContentType('application/json')
             .addHeader('foo', 'bar')
             .addHeader('foo', ['1', '2'])
             .addHeaders([hi: ['there']])
@@ -63,9 +61,7 @@ class HttpRequestSpec extends Specification {
             .setBufferResponseEntity(false)
 
         then:
-        request.getCharset() == 'ISO-8859-8'
         request.getAccept() == 'text/plain'
-        request.getContentType() == 'application/json'
         request.getHeaders() == [foo: ['bar', '1', '2'], hi: ['there']]
         request.getQueryParameters() == [foo: ['bar', '1', '2'], hi: ['there']]
         !request.isSslValidated()
@@ -124,26 +120,22 @@ class HttpRequestSpec extends Specification {
         def request = HttpRequest.build {
             uri = 'https://localhost:8080?going=away'
             accept = 'application/json'
-            contentType = 'text/plain'
             connectionTimeout = 10000
             readTimeout = 5000
             followRedirects = false
             sslValidated = false
             bufferResponseEntity = false
-            charset = 'ISO-1234'
             headers = [foo: 'bar']
         }
 
         then:
         request.uri == 'https://localhost:8080'
         request.accept == 'application/json'
-        request.contentType == 'text/plain'
         request.connectionTimeout == 10000
         request.readTimeout == 5000
         !request.followRedirects
         !request.sslValidated
         !request.bufferResponseEntity
-        request.charset == 'ISO-1234'
         request.headers == [foo: ['bar']]
         request.queryParameters == [going: ['away']]
     }

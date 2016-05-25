@@ -48,7 +48,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     def 'When a POST request is made to /testBasicPost, the proper response is received'() {
         when:
         def response = httpClientFactory.createHttpClient().post(
-            new HttpRequest().setUri("${baseUrl}/testBasicPost").setContentType('text/plain'),
+            new HttpRequest().setUri("${baseUrl}/testBasicPost"),
             "Please don't play the repeating game!"
         )
 
@@ -59,7 +59,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     def 'When a PUT request is made to /testBasicPut, the proper response is received'() {
         when:
         def response = httpClientFactory.createHttpClient().put(
-            new HttpRequest().setUri("${baseUrl}/testBasicPut").setContentType('text/plain'),
+            new HttpRequest().setUri("${baseUrl}/testBasicPut"),
             "Please don't play the repeating game!"
         )
 
@@ -334,8 +334,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate builder form of POST with a byte array entity works'() {
         when:
-        def response = httpClientFactory.createHttpClient().post('Hello'.getBytes()) {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
+            entity = 'Hello'.getBytes()
         }
 
         then:
@@ -344,7 +345,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate builder form of POST with a string entity works'() {
         when:
-        def response = httpClientFactory.createHttpClient().post('Hello') { uri = "${baseUrl}/testBasicPost" }
+        def response = httpClientFactory.createHttpClient().post {
+            uri = "${baseUrl}/testBasicPost"
+            entity = 'Hello'
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -355,7 +359,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         def stream = new ByteArrayInputStream('Hello'.getBytes())
 
         when:
-        def response = httpClientFactory.createHttpClient().post(stream) { uri = "${baseUrl}/testBasicPost" }
+        def response = httpClientFactory.createHttpClient().post {
+            uri = "${baseUrl}/testBasicPost"
+            entity = stream
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -363,8 +370,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate that a request can be made with a Map'() {
         when:
-        def response = httpClientFactory.createHttpClient().post([foo: ['bar', 'baz']]) {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
+            entity = [foo: ['bar', 'baz']]
         }
 
         then:
@@ -377,8 +385,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         String val = "friend"
 
         when:
-        def response = httpClientFactory.createHttpClient().post("Hello, ${val}!") {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
+            entity = "Hello, ${val}!"
         }
 
         then:
@@ -393,7 +402,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         form.addField('hi', 'there')
 
         when:
-        def response = httpClientFactory.createHttpClient().post(form) { uri = "${baseUrl}/testBasicPost" }
+        def response = httpClientFactory.createHttpClient().post {
+            uri = "${baseUrl}/testBasicPost"
+            entity = form
+        }
 
         then:
         response.getEntity(String).contains('foo=bar')
@@ -411,7 +423,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate builder form of PUT with a byte array entity works'() {
         when:
-        def response = httpClientFactory.createHttpClient().put('Hello'.getBytes()) { uri = "${baseUrl}/testBasicPut" }
+        def response = httpClientFactory.createHttpClient().put {
+            uri = "${baseUrl}/testBasicPut"
+            entity = 'Hello'.getBytes()
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -419,7 +434,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate builder form of PUT with a string entity works'() {
         when:
-        def response = httpClientFactory.createHttpClient().put('Hello') { uri = "${baseUrl}/testBasicPut" }
+        def response = httpClientFactory.createHttpClient().put {
+            uri = "${baseUrl}/testBasicPut"
+            entity = 'Hello'
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -430,7 +448,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         def stream = new ByteArrayInputStream('Hello'.getBytes())
 
         when:
-        def response = httpClientFactory.createHttpClient().put(stream) { uri = "${baseUrl}/testBasicPut" }
+        def response = httpClientFactory.createHttpClient().put {
+            uri = "${baseUrl}/testBasicPut"
+            entity = stream
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -580,9 +601,12 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'When a content type is already set, it will not be overwritten by a converter'() {
         when:
-        def response = httpClientFactory.createHttpClient().post('hi!') {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/printContentType"
-            contentType = 'foo/bar'
+            entity {
+                entity = 'hi!'
+                contentType = 'foo/bar'
+            }
         }
 
         then:
@@ -591,8 +615,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'When no content type is set, it will be set by the converter'() {
         when:
-        def response = httpClientFactory.createHttpClient().post('hi!') {
+        def response = httpClientFactory.createHttpClient().post() {
             uri = "${baseUrl}/printContentType"
+            entity = 'hi!'
         }
 
         then:
@@ -601,9 +626,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'When the response is not buffered, the entity can only be retrieved once'() {
         setup:
-        def response = httpClientFactory.createHttpClient().post([foo: ['bar', 'baz']]) {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
             bufferResponseEntity = false
+            entity = [foo: ['bar', 'baz']]
         }
         response.getEntity(Map) == [foo: ['bar', 'baz']]
 
@@ -616,8 +642,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'When the response is buffered, the entity can be retrieved multiple times'() {
         setup:
-        def response = httpClientFactory.createHttpClient().post([foo: ['bar', 'baz']]) {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
+            entity = [foo: ['bar', 'baz']]
         }
         response.getEntity(Map) == [foo: ['bar', 'baz']]
 
@@ -641,8 +668,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Ensure the LoggingFilter does not cause interruptions to HTTP requests.'() {
         when:
-        def response = httpClientFactory.createHttpClient().post("Hello, world") {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/testBasicPost"
+            entity = "Hello, world"
         }
 
         then:
@@ -666,9 +694,10 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         String input = 'åäö'
 
         when:
-        def response = httpClientFactory.createHttpClient().addFilter(new Slf4jLoggingFilter()).post(input) {
+        def response = httpClientFactory.createHttpClient().addFilter(new Slf4jLoggingFilter()).post {
             uri = "${baseUrl}/acceptContentType"
             accept = "text/plain;charset=${charset}"
+            entity = input
         }
 
         then:
@@ -685,8 +714,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     @Unroll
     def 'When #writeType is sent, the entity was properly written and received'() {
         when:
-        def response = httpClientFactory.createHttpClient().post(input) {
+        def response = httpClientFactory.createHttpClient().post {
             uri = "${baseUrl}/echo"
+            entity = input
         }
 
         then:
@@ -738,8 +768,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         }
 
         when:
-        def response = httpClientFactory.createHttpClient().addFilter(retryFilter).post(inputStream) {
+        def response = httpClientFactory.createHttpClient().addFilter(retryFilter).post {
             uri = "${baseUrl}/testBasicPost"
+            entity = inputStream
         }
 
         then:

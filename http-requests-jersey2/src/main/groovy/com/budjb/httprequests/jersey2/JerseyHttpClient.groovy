@@ -31,12 +31,12 @@ class JerseyHttpClient extends AbstractHttpClient {
      * Implements the logic to make an actual request with an HTTP client library.
      *
      * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
+     * @param entity An {@link InputStream} containing the response body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
 
@@ -79,15 +79,15 @@ class JerseyHttpClient extends AbstractHttpClient {
             builder = builder.accept(request.getAccept())
         }
 
-        Entity<InputStream> entity = null
-        if (inputStream) {
-            entity = Entity.entity(inputStream, request.getFullContentType())
+        Entity<InputStream> jerseyEntity = null
+        if (entity) {
+            jerseyEntity = Entity.entity(entity, entity.getFullContentType())
         }
 
         Response clientResponse
         try {
-            if (entity != null) {
-                clientResponse = builder.method(method.toString(), entity, Response)
+            if (jerseyEntity != null) {
+                clientResponse = builder.method(method.toString(), jerseyEntity, Response)
             }
             else {
                 clientResponse = builder.method(method.toString(), Response)

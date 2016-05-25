@@ -50,6 +50,14 @@ class ReferenceHttpClient extends AbstractHttpClient {
         connection.setReadTimeout(request.getReadTimeout())
         connection.setInstanceFollowRedirects(request.isFollowRedirects())
 
+        if (entity && entity.getFullContentType()) {
+            connection.setRequestProperty('Content-Type', entity.getFullContentType())
+        }
+
+        if (request.getAccept()) {
+            connection.setRequestProperty('Accept', request.getAccept())
+        }
+
         request.getHeaders().each { key, values ->
             if (values instanceof Collection) {
                 connection.setRequestProperty(key, values.join(','))
@@ -57,14 +65,6 @@ class ReferenceHttpClient extends AbstractHttpClient {
             else {
                 connection.setRequestProperty(key, values.toString())
             }
-        }
-
-        if (entity && request.getFullContentType()) {
-            connection.setRequestProperty('Content-Type', request.getFullContentType())
-        }
-
-        if (request.getAccept()) {
-            connection.setRequestProperty('Accept', request.getAccept())
         }
 
         if (context.getMethod().isSupportsResponseEntity() && entity != null) {

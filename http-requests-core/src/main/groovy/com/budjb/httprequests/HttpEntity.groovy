@@ -35,9 +35,18 @@ class HttpEntity extends InputStream {
     /**
      * Constructor.
      *
-     * @param inputStream
-     * @param contentType
-     * @param charset
+     * @param inputStream An {@link InputStream} containing the entity.
+     */
+    HttpEntity(InputStream inputStream) {
+        this(inputStream, DEFAULT_CONTENT_TYPE, DEFAULT_CHARACTER_SET)
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param inputStream An {@link InputStream} containing the entity.
+     * @param contentType Content-Type of the entity.
+     * @param charset Character set encoding of the entity.
      */
     HttpEntity(InputStream inputStream, String contentType, String charset) {
         if (inputStream == null) {
@@ -121,5 +130,26 @@ class HttpEntity extends InputStream {
             inputStream.close()
             inputStream = newInputStream
         }
+    }
+
+    /**
+     * Returns the Content-Type of the request with the character set appended to it.
+     *
+     * If the Content-Type is not set, <code>null</code> is returned.
+     *
+     * @return Content-Type of the request with the character set appended to it.
+     */
+    String getFullContentType() {
+        String contentType = this.contentType
+
+        if (!contentType) {
+            contentType = 'application/octet-stream'
+        }
+
+        if (charset) {
+            contentType += ";charset=${charset}"
+        }
+
+        return contentType
     }
 }

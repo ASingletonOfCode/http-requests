@@ -16,6 +16,7 @@
 package com.budjb.httprequests.filter.bundled
 
 import com.budjb.httprequests.HttpContext
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.HttpMethod
 import com.budjb.httprequests.HttpRequest
 import com.budjb.httprequests.HttpResponse
@@ -102,12 +103,13 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
     protected void logRequestInformation(HttpContext context, StringBuilder stringBuilder) {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
+        HttpEntity entity = context.getEntity()
 
         stringBuilder.append('Sending HTTP client request with the following data:\n')
         stringBuilder.append("> ${method.toString()} ${new URI(request.getUri()).toASCIIString()}\n")
 
-        if (request.getContentType()) {
-            stringBuilder.append("> Content-Type: ${request.getFullContentType()}\n")
+        if (entity && entity.getContentType()) {
+            stringBuilder.append("> Content-Type: ${entity.getFullContentType()}\n")
         }
         if (request.getAccept()) {
             stringBuilder.append("> Accept: ${request.getAccept()}\n")

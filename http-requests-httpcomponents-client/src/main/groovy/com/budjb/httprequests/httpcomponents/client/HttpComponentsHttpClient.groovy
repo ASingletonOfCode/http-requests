@@ -16,7 +16,6 @@
 package com.budjb.httprequests.httpcomponents.client
 
 import com.budjb.httprequests.*
-import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.*
 import org.apache.http.client.utils.URIBuilder
@@ -30,12 +29,12 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
      * Implements the logic to make an actual request with an HTTP client library.
      *
      * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
+     * @param entity An {@link HttpEntity} containing the response body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
 
@@ -70,8 +69,8 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
             httpRequest.setHeader('Accept', request.getAccept())
         }
 
-        if (inputStream && httpRequest instanceof HttpEntityEnclosingRequestBase) {
-            HttpEntity entity = new InputStreamEntity(inputStream) {
+        if (entity && httpRequest instanceof HttpEntityEnclosingRequestBase) {
+            org.apache.http.HttpEntity httpEntity = new InputStreamEntity(entity) {
                 @Override
                 public void writeTo(final OutputStream outstream) throws IOException {
                     OutputStream filtered = filterOutputStream(context, outstream)
@@ -85,8 +84,8 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
                     filtered.close()
                 }
             }
-            entity.setContentType(request.getFullContentType())
-            httpRequest.setEntity(entity)
+            httpEntity.setContentType(entity.getFullContentType())
+            httpRequest.setEntity(httpEntity)
         }
 
         return new HttpComponentsResponse(request, converterManager, client.execute(httpRequest))

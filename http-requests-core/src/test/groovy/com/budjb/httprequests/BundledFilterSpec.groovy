@@ -20,7 +20,6 @@ import com.budjb.httprequests.converter.bundled.StringEntityWriter
 import com.budjb.httprequests.filter.bundled.BasicAuthFilter
 import com.budjb.httprequests.filter.bundled.DeflateFilter
 import com.budjb.httprequests.filter.bundled.GZIPFilter
-import org.slf4j.Logger
 import spock.lang.Specification
 
 class BundledFilterSpec extends Specification {
@@ -37,8 +36,9 @@ class BundledFilterSpec extends Specification {
         client.addFilter(new GZIPFilter())
 
         when:
-        def response = client.post 'hi there', {
+        def response = client.post {
             uri = 'http://foo.bar.com'
+            entity = 'hi there'
         }
 
         then:
@@ -51,8 +51,9 @@ class BundledFilterSpec extends Specification {
         client.addFilter(new DeflateFilter())
 
         when:
-        def response = client.post 'hi there', {
+        def response = client.post {
             uri = 'http://foo.bar.com'
+            entity = 'hi there'
         }
 
         then:
