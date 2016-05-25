@@ -27,7 +27,7 @@ class HttpResponseSpec extends Specification {
         converterManager.add(new StringEntityReader())
 
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
+            new HttpRequest(converterManager),
             converterManager,
             200,
             [:],
@@ -48,7 +48,7 @@ class HttpResponseSpec extends Specification {
         converterManager.add(new StringEntityReader())
 
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
+            new HttpRequest(converterManager),
             converterManager,
             200,
             [:],
@@ -66,9 +66,10 @@ class HttpResponseSpec extends Specification {
 
     def 'Verify header parsing and retrieval'() {
         setup:
+        def converterManager = new EntityConverterManager()
         def response = new MockHttpResponse(
-            new HttpRequest(),
-            new EntityConverterManager(),
+            new HttpRequest(converterManager),
+            converterManager,
             200,
             [
                 foo : ['bar', 'baz'],
@@ -100,9 +101,10 @@ class HttpResponseSpec extends Specification {
 
     def 'Ensure the Allow header is parsed properly'() {
         setup:
+        def converterManager = new EntityConverterManager()
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
-            new EntityConverterManager(),
+            new HttpRequest(converterManager),
+            converterManager,
             200,
             ['Allow': 'GET,POST,PUT'],
             null,
@@ -116,9 +118,10 @@ class HttpResponseSpec extends Specification {
     @Unroll
     def 'When the content-type is #fullContentType, the content type and character set are parsed properly'() {
         setup:
+        def converterManager = new EntityConverterManager()
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
-            new EntityConverterManager(),
+            new HttpRequest(converterManager),
+            converterManager,
             200,
             [:],
             fullContentType,
@@ -144,9 +147,10 @@ class HttpResponseSpec extends Specification {
 
     def 'When the response contains no entity, hasEntity() returns false'() {
         setup:
+        def converterManager = new EntityConverterManager()
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
-            new EntityConverterManager(),
+            new HttpRequest(converterManager),
+            converterManager,
             200,
             [:],
             null,
@@ -159,9 +163,10 @@ class HttpResponseSpec extends Specification {
 
     def 'When the response contains an un-buffered input stream, hasEntity() returns true'() {
         setup:
+        def converterManager = new EntityConverterManager()
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity = false },
-            new EntityConverterManager(),
+            new HttpRequest(converterManager).setBufferResponseEntity(false),
+            converterManager,
             200,
             [:],
             null,
@@ -174,9 +179,10 @@ class HttpResponseSpec extends Specification {
 
     def 'When the response contains a byte array entity, hasEntity() returns true'() {
         setup:
+        def converterManager = new EntityConverterManager()
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity = true },
-            new EntityConverterManager(),
+            new HttpRequest(converterManager).setBufferResponseEntity(true),
+            converterManager,
             200,
             [:],
             null,

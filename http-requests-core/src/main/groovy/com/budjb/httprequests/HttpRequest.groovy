@@ -15,10 +15,32 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.converter.EntityConverterManager
+
 /**
  * An object used to configure an HTTP request.
  */
 class HttpRequest implements Cloneable {
+    /**
+     * A delegate for DSL-based request entities.
+     */
+    private class EntityDSLDelegate {
+        /**
+         * Request entity.
+         */
+        Object entity
+
+        /**
+         * Request entity Content-Type.
+         */
+        String contentType
+
+        /**
+         * Character set of the entity.
+         */
+        String charset
+    }
+
     /**
      * URI of the request.
      */
@@ -66,42 +88,33 @@ class HttpRequest implements Cloneable {
     boolean bufferResponseEntity = true
 
     /**
-     * Construct a new {@link HttpRequest} object, configured with the given closure.
-     *
-     * @param closure
-     * @return
+     * Entity of the request.
      */
-    static HttpRequest build(@DelegatesTo(HttpRequest) Closure closure) {
-        HttpRequest request = new HttpRequest()
+    HttpEntity entity
 
-        closure = closure.clone() as Closure
-        closure.delegate = request
-        closure.call()
+    /**
+     * Whether the DSL closure is currently inside an entity block.
+     */
+    private inEntity
 
-        return request
-    }
+    /**
+     * Whether the DSL closure is currently inside a multipart block.
+     */
+    private inMultipart
+
+    /**
+     * Entity converter manager.
+     */
+    EntityConverterManager converterManager
 
     /**
      * Base constructor.
      */
-    HttpRequest() { void }
-
-    /**
-     * Constructor that builds the request from a URI.
-     *
-     * @param uri URI of the request.
-     */
-    HttpRequest(URI uri) {
-        parseUri(uri)
-    }
-
-    /**
-     * Constructor that builds the request from a URI string.
-     *
-     * @param uri URI of the request.
-     */
-    HttpRequest(String uri) {
-        parseUri(uri)
+    HttpRequest(EntityConverterManager converterManager) {
+        if (!converterManager) {
+            throw new IllegalArgumentException("converter manager must not be null")
+        }
+        this.converterManager = converterManager
     }
 
     /**
@@ -444,7 +457,7 @@ class HttpRequest implements Cloneable {
      * @return A new {@link HttpRequest}.
      */
     Object clone() {
-        HttpRequest request = new HttpRequest()
+        HttpRequest request = new HttpRequest(converterManager)
 
         request.setUri(getUri())
         request.setAccept(getAccept())
@@ -483,5 +496,40 @@ class HttpRequest implements Cloneable {
         }
 
         return target
+    }
+
+    void entity(@DelegatesTo(EntityDSLDelegate) Closure closure) {
+        inEntity = true
+        EntityDSLDelegate delegate = new EntityDSLDelegate()
+        closure = closure.clone() as Closure
+        closure.delegate = delegate
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.call()
+        inEntity = false
+
+        if (delegate.entity != null) {
+            setEntity(converterManager.write(delegate.entity, delegate.contentType, delegate.charset))
+        }
+    }
+
+    /**
+     * Sets the request entity.
+     *
+     * @param entity Entity to set in the request.
+     * @return The object this method was called on.
+     */
+    HttpRequest setEntity(Object entity) {
+        return setEntity(converterManager.write(entity, null, null))
+    }
+
+    /**
+     * Sets the request entity.
+     *
+     * @param entity Entity to set in the request.
+     * @return The object this method was called on.
+     */
+    HttpRequest setEntity(HttpEntity entity) {
+        this.entity = entity
+        return this
     }
 }

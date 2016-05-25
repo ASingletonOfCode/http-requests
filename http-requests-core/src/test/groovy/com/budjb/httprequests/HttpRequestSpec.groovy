@@ -15,17 +15,19 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.converter.EntityConverterManager
+import com.budjb.httprequests.reference.ReferenceHttpClientFactory
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class HttpRequestSpec extends Specification {
     @Unroll
-    def 'When an HttpRequest is build with URI #raw, the properties of the URI are parsed correctly'() {
+    def 'When URI #raw is set, the properties of the URI are parsed correctly'() {
         setup:
         URI uri = new URI(raw)
 
         when:
-        HttpRequest request = new HttpRequest(uri)
+        HttpRequest request = new HttpRequest(new EntityConverterManager()).setUri(uri)
 
         then:
         request.getUri() == parsed
@@ -44,7 +46,7 @@ class HttpRequestSpec extends Specification {
 
     def 'When the builder syntax is used, all properties are set correctly'() {
         setup:
-        HttpRequest request = new HttpRequest()
+        HttpRequest request = new HttpRequest(new EntityConverterManager())
 
         when:
         request.setUri('http://localhost')
@@ -105,7 +107,7 @@ class HttpRequestSpec extends Specification {
     def 'When a URI is passed to setUri(), the request properties are set as expected'() {
         setup:
         def uri = new URI('https://localhost:12345?f=&foo=bar&foo=baz')
-        def request = new HttpRequest().setUri('http://foo.bar.com?var=val')
+        def request = new HttpRequest(new EntityConverterManager()).setUri('http://foo.bar.com?var=val')
 
         when:
         request.setUri(uri)
@@ -116,8 +118,11 @@ class HttpRequestSpec extends Specification {
     }
 
     def 'When a request is built with the closure builder, the properties are set correctly'() {
+        setup:
+        def client = new ReferenceHttpClientFactory().createHttpClient()
+
         when:
-        def request = HttpRequest.build {
+        def request = client.createHttpRequest {
             uri = 'https://localhost:8080?going=away'
             accept = 'application/json'
             connectionTimeout = 10000

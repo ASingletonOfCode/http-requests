@@ -17,9 +17,6 @@ package com.budjb.httprequests
 
 import com.budjb.httprequests.converter.EntityConverter
 import com.budjb.httprequests.converter.EntityConverterManager
-import com.budjb.httprequests.converter.EntityWriter
-import com.budjb.httprequests.delegate.RequestDSLDelegate
-import com.budjb.httprequests.exception.UnsupportedConversionException
 import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.filter.HttpClientFilterManager
 
@@ -52,10 +49,10 @@ interface HttpClient {
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse execute(HttpMethod method, @DelegatesTo(RequestDSLDelegate) Closure closure) throws IOException
+    HttpResponse execute(HttpMethod method, @DelegatesTo(HttpRequest) Closure closure) throws IOException
 
     /**
-     * Execute an HTTP request with the given method and request parameters and without a request entity.
+     * Execute an HTTP request with the given method and request parameters.
      *
      * @param method HTTP method to use with the HTTP request.
      * @param request Request properties to use with the HTTP request.
@@ -63,32 +60,6 @@ interface HttpClient {
      * @throws IOException
      */
     HttpResponse execute(HttpMethod method, HttpRequest request) throws IOException
-
-    /**
-     * Executes an HTTP request with the given method, request parameters, and entity.
-     *
-     * @param method HTTP method to use with the HTTP request.
-     * @param request Request properties to use with the HTTP request.
-     * @param entity An {@link HttpEntity} containing the response body.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     */
-    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException
-
-    /**
-     * Executes an HTTP request with the given method, request parameters, and entity.
-     *
-     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
-     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
-     *
-     * @param method HTTP method to use with the HTTP request.
-     * @param request Request properties to use with the HTTP request.
-     * @param entity Request entity.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     * @throws UnsupportedConversionException
-     */
-    HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException
 
     /**
      * Perform an HTTP GET request.
@@ -106,19 +77,19 @@ interface HttpClient {
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse get(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse get(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP POST request and (optionally) a request entity.
+     * Perform an HTTP POST request.
      *
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse post(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse post(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP POST request without a request entity.
+     * Perform an HTTP POST request.
      *
      * @param request Request properties to use with the HTTP request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
@@ -127,40 +98,16 @@ interface HttpClient {
     HttpResponse post(HttpRequest request) throws IOException
 
     /**
-     * Perform an HTTP POST request with the given entity.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity An {@link HttpEntity} containing the response body.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     */
-    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException
-
-    /**
-     * Perform an HTTP POST request with the given entity.
-     *
-     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
-     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity Request entity.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     * @throws UnsupportedConversionException
-     */
-    HttpResponse post(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException
-
-    /**
-     * Perform an HTTP PUT request and (optionally) a request entity.
+     * Perform an HTTP PUT request.
      *
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse put(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse put(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
-     * Perform an HTTP PUT request without a request entity.
+     * Perform an HTTP PUT request.
      *
      * @param request Request properties to use with the HTTP request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
@@ -169,37 +116,13 @@ interface HttpClient {
     HttpResponse put(HttpRequest request) throws IOException
 
     /**
-     * Perform an HTTP PUT request with the given entity.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity An {@link HttpEntity} containing the response body.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     */
-    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException
-
-    /**
-     * Perform an HTTP PUT request with the given entity.
-     *
-     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
-     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity Request entity.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     * @throws UnsupportedConversionException
-     */
-    HttpResponse put(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException
-
-    /**
      * Perform an HTTP DELETE request.
      *
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse delete(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse delete(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP DELETE request.
@@ -217,7 +140,7 @@ interface HttpClient {
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse options(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse options(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP OPTIONS request.
@@ -229,37 +152,13 @@ interface HttpClient {
     HttpResponse options(HttpRequest request) throws IOException
 
     /**
-     * Perform an HTTP OPTIONS request with the given entity.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity An {@link HttpEntity} containing the response body.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     */
-    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException
-
-    /**
-     * Perform an HTTP OPTIONS request with the given entity.
-     *
-     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
-     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
-     *
-     * @param request Request properties to use with the HTTP request.
-     * @param entity Request entity.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
-     * @throws UnsupportedConversionException
-     */
-    HttpResponse options(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException
-
-    /**
      * Perform an HTTP HEAD request.
      *
      * @param requestClosure Closure that configures the request.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse head(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse head(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP HEAD request.
@@ -277,7 +176,7 @@ interface HttpClient {
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
-    HttpResponse trace(@DelegatesTo(RequestDSLDelegate) Closure requestClosure) throws IOException
+    HttpResponse trace(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException
 
     /**
      * Perform an HTTP TRACE request.
@@ -343,4 +242,19 @@ interface HttpClient {
      * Remove all entity converters.
      */
     void clearEntityConverters()
+
+    /**
+     * Creates an {@link HttpRequest} with all of its dependencies included.
+     *
+     * @return A new {@link HttpRequest}.
+     */
+    HttpRequest createHttpRequest()
+
+    /**
+     * Creates an {@link HttpRequest} and configures it with the given closure.
+     *
+     * @param closure Closure used to configure the request.
+     * @return A new, configured {@link HttpRequest}.
+     */
+    HttpRequest createHttpRequest(@DelegatesTo(HttpRequest) Closure closure)
 }
