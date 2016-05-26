@@ -23,19 +23,9 @@ import com.budjb.httprequests.exception.UnsupportedConversionException
  */
 abstract class HttpResponse implements Closeable {
     /**
-     * Default character set of the response.
-     */
-    private static final DEFAULT_CHARSET = 'UTF-8'
-
-    /**
      * The HTTP status of the response.
      */
     int status
-
-    /**
-     * Content type of the response.
-     */
-    String contentType
 
     /**
      * Headers of the response.
@@ -48,14 +38,9 @@ abstract class HttpResponse implements Closeable {
     List<HttpMethod> allow = []
 
     /**
-     * The character set of the response.
-     */
-    protected String charset
-
-    /**
      * Response entity.
      */
-    InputStream entity
+    HttpEntity entity
 
     /**
      * Request properties used to configure the request that generated this response.
@@ -68,12 +53,6 @@ abstract class HttpResponse implements Closeable {
     EntityConverterManager converterManager
 
     /**
-     * A byte array that contains the entire entity as a buffer. This is only filled when
-     * {@link HttpRequest#bufferResponseEntity} is <code>true</code>.
-     */
-    private byte[] entityBuffer
-
-    /**
      * Constructor.
      *
      * @param request Request properties used to make the request.
@@ -82,44 +61,6 @@ abstract class HttpResponse implements Closeable {
     HttpResponse(HttpRequest request, EntityConverterManager converterManager) {
         this.request = request
         this.converterManager = converterManager
-    }
-
-    /**
-     * Sets the content type of the response.
-     *
-     * @param contentType Content type of the response.
-     */
-    void setContentType(String contentType) {
-        if (!contentType) {
-            this.contentType = null
-            this.charset = null
-            return
-        }
-
-        List<String> parts = contentType.tokenize(';')
-
-        this.contentType = parts.remove(0)
-
-        TreeMap<String, String> parameters = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
-        for (String part : parts) {
-            List<String> paramParts = part.tokenize('=').collect { it.trim() }
-
-            String key = paramParts[0]
-            String value = paramParts.size() > 1 ? paramParts[1] : null
-
-            parameters.put(key, value)
-        }
-
-        String charset = DEFAULT_CHARSET
-
-        if (parameters.containsKey('charset')) {
-            String cs = parameters.get('charset')
-            if (cs) {
-                charset = cs
-            }
-        }
-
-        this.charset = charset
     }
 
     /**
@@ -218,53 +159,6 @@ abstract class HttpResponse implements Closeable {
     }
 
     /**
-     * Sets the entity.
-     *
-     * @param inputStream
-     */
-    void setEntity(InputStream inputStream) {
-        entity = null
-        entityBuffer = null
-
-        if (inputStream == null) {
-            return
-        }
-
-        PushbackInputStream pushBackInputStream = new PushbackInputStream(inputStream)
-        int read = pushBackInputStream.read()
-        if (read == -1) {
-            pushBackInputStream.close()
-            return
-        }
-
-        pushBackInputStream.unread(read)
-
-        if (request.isBufferResponseEntity()) {
-            entityBuffer = StreamUtils.readBytes(pushBackInputStream)
-            pushBackInputStream.close()
-        }
-        else {
-            entity = new EntityInputStream(pushBackInputStream)
-        }
-    }
-
-    /**
-     * Returns the entity.
-     *
-     * If the entity was buffered, calling this method will always return a new InputStream.
-     * Otherwise, the original InputStream will be returned. Note that if the entity is not
-     * buffered and it was already read once, subsequent reading will likely fail.
-     *
-     * @return The response entity.
-     */
-    InputStream getEntity() {
-        if (entityBuffer != null) {
-            return new EntityInputStream(new ByteArrayInputStream(entityBuffer))
-        }
-        return entity
-    }
-
-    /**
      * Returns the entity, converted to the given class type.
      *
      * @param type Class type to convert the entity to.
@@ -272,8 +166,8 @@ abstract class HttpResponse implements Closeable {
      * @throws UnsupportedConversionException when no converter is found to convert the entity.
      */
     public <T> T getEntity(Class<T> type) throws UnsupportedConversionException, IOException {
-        InputStream entity = getEntity()
-        T object = converterManager.read(type, entity, getContentType(), getCharset())
+        HttpEntity entity = getEntity()
+        T object = converterManager.read(type, entity)
         entity.close()
 
         return object
@@ -299,7 +193,7 @@ abstract class HttpResponse implements Closeable {
      * @return Whether the response contains an entity.
      */
     boolean hasEntity() {
-        return entity != null || entityBuffer != null
+        return entity != null
     }
 
     /**
@@ -316,30 +210,6 @@ abstract class HttpResponse implements Closeable {
     }
 
     /**
-     * Returns the Content-Type of the response.
-     *
-     * @return Content-Type of the response.
-     */
-    String getContentType() {
-        if (!contentType && headers.containsKey('Content-Type')) {
-            setContentType(headers.get('Content-Type').first())
-        }
-        return contentType
-    }
-
-    /**
-     * Returns the character set of the response.
-     *
-     * @return Character set of the response.
-     */
-    String getCharset() {
-        if (!charset && !contentType && headers.containsKey('Content-Type')) {
-            setContentType(headers.get('Content-Type').first())
-        }
-        return charset
-    }
-
-    /**
      * Add a value to the given header name.
      *
      * @param key Name of the value.
@@ -353,11 +223,43 @@ abstract class HttpResponse implements Closeable {
     }
 
     /**
-     * Returns whether the response entity is buffered. If there is no entity, will return <code>false</code>.
+     * Sets the entity in the response.
      *
-     * @return Whether the response entity is buffered.
+     * @param entity Entity contained the response.
      */
-    boolean isEntityBuffered() {
-        return entityBuffer != null
+    void setEntity(HttpEntity entity) {
+        if (!entity) {
+            return
+        }
+
+        if (request.isBufferResponseEntity()) {
+            entity.buffer()
+        }
+
+        this.entity = entity
+    }
+
+    /**
+     * Returns an {@link InputStream} iff the given input stream is not <code>null</code>
+     * and it has at least one byte to read.
+     *
+     * @param inputStream Input stream to check.
+     * @return The passed-in input stream if there are bytes to read.
+     */
+    protected InputStream getNonEmptyInputStream(InputStream inputStream) {
+        if (!inputStream) {
+            return null
+        }
+
+        int read = inputStream.read()
+
+        if (read == -1) {
+            return null
+        }
+
+        inputStream = new PushbackInputStream(inputStream)
+        inputStream.unread(read)
+
+        return inputStream
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.converter
 
-import com.budjb.httprequests.EntityInputStream
+import com.budjb.httprequests.ContentType
 import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
@@ -106,16 +106,11 @@ class EntityConverterManager {
      *
      * @param entity Entity object to convert.
      * @param contentType Content-Type of the entity. Can be <code>null</code>.
-     * @param charset Character set to encode the entity with. Can be <code>null</code>.
      * @return Converted entity as an HttpEntity.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    HttpEntity write(Object entity, String contentType, String charset) throws UnsupportedConversionException {
+    HttpEntity write(Object entity, ContentType contentType) throws UnsupportedConversionException {
         Class<?> type = entity.getClass()
-
-        if (!charset) {
-            charset = HttpEntity.DEFAULT_CHARACTER_SET
-        }
 
         for (EntityWriter writer : getEntityWriters()) {
             try {
@@ -123,13 +118,13 @@ class EntityConverterManager {
                     continue
                 }
 
-                InputStream inputStream = writer.write(entity, charset)
+                InputStream inputStream = writer.write(entity, contentType)
 
                 if (inputStream != null) {
                     if (!contentType) {
                         contentType = writer.getContentType()
                     }
-                    return new HttpEntity(inputStream, contentType, charset)
+                    return new HttpEntity(inputStream, contentType)
                 }
             }
             catch (Exception e) {
@@ -146,23 +141,21 @@ class EntityConverterManager {
      * @param type Object type to attempt conversion to.
      * @param entity Entity input stream.
      * @param contentType Content Type of the entity.
-     * @param charset Character set of the entity.
      * @return The converted object.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    public <T> T read(Class<?> type, InputStream entity, String contentType, String charset) throws UnsupportedConversionException, IOException {
-        if (entity instanceof EntityInputStream && entity.isClosed()) {
-            throw new IOException("entity stream is closed")
-        }
-
+    public <T> T read(Class<?> type, HttpEntity entity) throws UnsupportedConversionException, IOException {
         for (EntityReader reader : getEntityReaders()) {
             if (reader.supports(type)) {
                 try {
-                    T object = reader.read(entity, contentType, charset) as T
+                    T object = reader.read(entity) as T
 
                     if (object != null) {
                         return object
                     }
+                }
+                catch (IOException e) {
+                    throw e
                 }
                 catch (Exception e) {
                     log.trace("error occurred during conversion with EntityReader ${reader.getClass()}", e)

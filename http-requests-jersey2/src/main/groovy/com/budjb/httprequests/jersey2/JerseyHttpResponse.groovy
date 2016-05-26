@@ -15,6 +15,8 @@
  */
 package com.budjb.httprequests.jersey2
 
+import com.budjb.httprequests.ContentType
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.HttpRequest
 import com.budjb.httprequests.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
@@ -45,13 +47,12 @@ class JerseyHttpResponse extends HttpResponse {
         setStatus(response.getStatus())
         setHeaders(response.getHeaders())
 
-        if (response.getMediaType()) {
-            setContentType(response.getMediaType().toString())
-        }
-
         if (response.hasEntity()) {
-            setEntity(response.getEntity() as InputStream)
-            if (request.isBufferResponseEntity()) {
+            InputStream inputStream = getNonEmptyInputStream(response.getEntity() as InputStream)
+            if (inputStream) {
+                setEntity(new HttpEntity(inputStream, new ContentType(response.getMediaType()?.toString())))
+            }
+            else {
                 close()
             }
         }

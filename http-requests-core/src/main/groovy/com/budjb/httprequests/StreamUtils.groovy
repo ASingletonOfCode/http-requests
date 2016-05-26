@@ -33,7 +33,7 @@ abstract class StreamUtils {
      * @param inputStream Input stream to read from.
      * @return Byte array read from the input stream.
      */
-    static byte[] readBytes(InputStream inputStream) {
+    static byte[] readBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
 
         byte[] buffer = new byte[1024]

@@ -50,8 +50,8 @@ class ReferenceHttpClient extends AbstractHttpClient {
         connection.setReadTimeout(request.getReadTimeout())
         connection.setInstanceFollowRedirects(request.isFollowRedirects())
 
-        if (entity && entity.getFullContentType()) {
-            connection.setRequestProperty('Content-Type', entity.getFullContentType())
+        if (entity && entity.getContentType()) {
+            connection.setRequestProperty('Content-Type', entity.getContentType().toString())
         }
 
         if (request.getAccept()) {
@@ -75,7 +75,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
             if (context.getMethod().isSupportsRequestEntity()) {
                 connection.setDoOutput(true)
                 OutputStream outputStream = filterOutputStream(context, connection.getOutputStream())
-                StreamUtils.shovel(entity, outputStream)
+                StreamUtils.shovel(entity.getInputStream(), outputStream)
                 entity.close()
                 outputStream.close()
             }
@@ -83,7 +83,6 @@ class ReferenceHttpClient extends AbstractHttpClient {
                 entity.close()
             }
         }
-
 
         return new ReferenceHttpResponse(request, converterManager, connection)
     }

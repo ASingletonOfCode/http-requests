@@ -64,6 +64,14 @@ class JerseyHttpClient extends AbstractHttpClient {
 
         WebResource.Builder builder = resource.getRequestBuilder()
 
+        if (entity && entity.contentType) {
+            builder = builder.type(entity.contentType.toString())
+        }
+
+        if (request.getAccept()) {
+            builder = builder.accept(request.getAccept())
+        }
+
         request.getHeaders().each { name, values ->
             if (values instanceof Collection) {
                 values.each { value ->
@@ -75,18 +83,10 @@ class JerseyHttpClient extends AbstractHttpClient {
             }
         }
 
-        if (entity && entity.getFullContentType()) {
-            builder = builder.type(entity.getFullContentType())
-        }
-
-        if (request.getAccept()) {
-            builder = builder.accept(request.getAccept())
-        }
-
         ClientResponse response
         try {
             if (entity != null) {
-                response = builder.method(method.toString(), ClientResponse, entity)
+                response = builder.method(method.toString(), ClientResponse, entity.getInputStream())
             }
             else {
                 response = builder.method(method.toString(), ClientResponse)

@@ -60,7 +60,7 @@ class HttpResponseSpec extends Specification {
         String entity = response.getEntity(String)
 
         then:
-        response.charset == 'UTF-8'
+        response.entity.contentType.charset == ContentType.DEFAULT_HTTP_CHARACTER_SET
         entity == 'åäö'
     }
 
@@ -125,24 +125,24 @@ class HttpResponseSpec extends Specification {
             200,
             [:],
             fullContentType,
-            null
+            new ByteArrayInputStream('test'.bytes)
         )
 
         expect:
-        response.getContentType() == contentType
-        response.getCharset() == charset
+        response.entity.contentType?.fullType == contentType
+        response.entity.contentType?.charset == charset
 
         where:
-        fullContentType                   | contentType  | charset
-        null                              | null         | null
-        ''                                | null         | null
-        'text/plain'                      | 'text/plain' | 'UTF-8'
-        'text/plain;'                     | 'text/plain' | 'UTF-8'
-        'text/plain;charset=foobar'       | 'text/plain' | 'foobar'
-        'text/plain;q=0.9;charset=foobar' | 'text/plain' | 'foobar'
-        'text/plain;q=0.9'                | 'text/plain' | 'UTF-8'
-        'text/plain;charset'              | 'text/plain' | 'UTF-8'
-        'text/plain;charset='             | 'text/plain' | 'UTF-8'
+        fullContentType                   | contentType                | charset
+        null                              | 'application/octet-stream' | 'UTF-8'
+        ''                                | 'application/octet-stream' | 'UTF-8'
+        'text/plain'                      | 'text/plain'               | 'UTF-8'
+        'text/plain;'                     | 'text/plain'               | 'UTF-8'
+        'text/plain;charset=foobar'       | 'text/plain'               | 'foobar'
+        'text/plain;q=0.9;charset=foobar' | 'text/plain'               | 'foobar'
+        'text/plain;q=0.9'                | 'text/plain'               | 'UTF-8'
+        'text/plain;charset'              | 'text/plain'               | 'UTF-8'
+        'text/plain;charset='             | 'text/plain'               | 'UTF-8'
     }
 
     def 'When the response contains no entity, hasEntity() returns false'() {

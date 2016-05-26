@@ -15,6 +15,8 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.ContentType
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.converter.EntityReader
 import groovy.json.JsonSlurper
 
@@ -38,19 +40,15 @@ class JsonEntityReader implements EntityReader {
      *
      * If an error occurs, null may be returned so that another converter can attempt a conversion.
      *
-     * @param entity Entity as an {@link InputStream}.
-     * @param contentType Content-Type of the entity.
-     * @param charset Character set of the entity.
+     * @param entity Entity as an {@link HttpEntity}.
      * @return The converted entity.
      * @throws Exception when an unexpected error occurs during conversion.
      */
     @Override
-    Object read(InputStream entity, String contentType, String charset) throws Exception {
-        if (charset) {
-            return new JsonSlurper().parse(entity, charset)
-        }
-        else {
-            return new JsonSlurper().parse(entity)
-        }
+    Object read(HttpEntity entity) throws Exception {
+        return new JsonSlurper().parse(
+            entity.getInputStream(),
+            entity.contentType?.charset ?: ContentType.DEFAULT_HTTP_CHARACTER_SET
+        )
     }
 }

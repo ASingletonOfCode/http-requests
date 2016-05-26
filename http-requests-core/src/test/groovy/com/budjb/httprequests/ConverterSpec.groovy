@@ -47,7 +47,7 @@ class ConverterSpec extends Specification {
         EntityConverterManager converterManager = new EntityConverterManager()
 
         when:
-        converterManager.read(String, new ByteArrayInputStream([1, 2, 3] as byte[]), null, null)
+        converterManager.read(String, new HttpEntity(new ByteArrayInputStream([1, 2, 3] as byte[])))
 
         then:
         thrown UnsupportedConversionException
@@ -58,7 +58,7 @@ class ConverterSpec extends Specification {
         EntityConverterManager converterManager = new EntityConverterManager()
 
         when:
-        converterManager.write('Hello!', null, null)
+        converterManager.write('Hello!', null)
 
         then:
         thrown UnsupportedConversionException

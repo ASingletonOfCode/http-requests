@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.ContentType
 import com.budjb.httprequests.converter.EntityWriter
 
 class ByteArrayEntityWriter implements EntityWriter {
@@ -26,8 +27,8 @@ class ByteArrayEntityWriter implements EntityWriter {
      * @return Content-Type of the converted object, or null if unknown.
      */
     @Override
-    String getContentType() {
-        return 'application/octet-stream'
+    ContentType getContentType() {
+        return ContentType.APPLICATION_OCTET_STREAM
     }
 
     /**
@@ -47,12 +48,11 @@ class ByteArrayEntityWriter implements EntityWriter {
      * If an error occurs, null may be returned so that another converter may attempt conversion.
      *
      * @param entity Entity object to convert into a byte array.
-     * @param characterSet The character set of the request.
      * @return An {@link InputStream} containing the converted entity.
      * @throws Exception when an unexpected error occurs.
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
+    InputStream write(Object entity, ContentType characterSet) throws Exception {
         return new ByteArrayInputStream(entity as byte[])
     }
 }

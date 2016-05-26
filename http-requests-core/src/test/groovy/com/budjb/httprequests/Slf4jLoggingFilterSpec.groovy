@@ -68,7 +68,7 @@ class Slf4jLoggingFilterSpec extends Specification {
 
     def 'When a response has a non-empty entity, the entity is logged'() {
         setup:
-        InputStream responseInputStream = new EntityInputStream(new ByteArrayInputStream('response stuff'.bytes))
+        InputStream responseInputStream = new ByteArrayInputStream('response stuff'.bytes)
         client.responseInputStream = responseInputStream
         client.status = 200
 
@@ -77,7 +77,6 @@ class Slf4jLoggingFilterSpec extends Specification {
 
         then:
         response.status == 200
-        responseInputStream.isClosed()
         1 * log.trace('Sending HTTP client request with the following data:\n> GET https://example.com\n\n' +
             'Received HTTP server response with the following data:\n< 200\nresponse stuff\n')
     }
@@ -100,7 +99,7 @@ class Slf4jLoggingFilterSpec extends Specification {
     def 'When a response has a non-empty entity that is not buffered, the entity is logged but the response input stream is not closed'() {
         setup:
         String content = '0123456789' * 1100
-        InputStream responseInputStream = new EntityInputStream(new ByteArrayInputStream(content.bytes))
+        InputStream responseInputStream = new ByteArrayInputStream(content.bytes)
         client.responseInputStream = responseInputStream
         client.status = 200
 
@@ -112,12 +111,10 @@ class Slf4jLoggingFilterSpec extends Specification {
 
         then:
         response.status == 200
-        !responseInputStream.isClosed()
-        response.getEntity().getClass() == EntityInputStream
-        response.getEntity().source.getClass() == PushbackInputStream
-        response.getEntity().source.in.getClass() == BufferedInputStream
-        response.getEntity().source.in.count == 10001
+        !response.getEntity().isBuffered()
+        response.getEntity().getClass() == HttpEntity
+        response.getEntity().inputStream.getClass() == BufferedInputStream
+        response.getEntity().inputStream.count == 10001
         response.getEntity(String) == content
-        !response.isEntityBuffered()
     }
 }

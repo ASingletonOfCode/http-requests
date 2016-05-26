@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.ContentType
 import com.budjb.httprequests.FormData
 import com.budjb.httprequests.converter.EntityWriter
 
@@ -30,8 +31,8 @@ class FormDataEntityWriter implements EntityWriter {
      * @return Content-Type of the converted object, or null if unknown.
      */
     @Override
-    String getContentType() {
-        return 'application/x-www-form-urlencoded'
+    ContentType getContentType() {
+        return ContentType.APPLICATION_X_WWW_FORM_URLENCODED
     }
 
     /**
@@ -51,15 +52,17 @@ class FormDataEntityWriter implements EntityWriter {
      * If an error occurs, null may be returned so that another converter may attempt conversion.
      *
      * @param entity Entity as an {@link InputStream}.
-     * @param characterSet The character set of the request.
+     * @param contentType Content-Type of the entity. May be null.
      * @return The converted object, or null if an error occurs.
      * @throws Exception when an unexpected error occurs.
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
+    InputStream write(Object entity, ContentType contentType) throws Exception {
         if (!(entity instanceof FormData)) {
             return null
         }
+
+        String characterSet = contentType?.charset ?: ContentType.DEFAULT_SYSTEM_CHARACTER_SET
 
         List<String> parts = []
 

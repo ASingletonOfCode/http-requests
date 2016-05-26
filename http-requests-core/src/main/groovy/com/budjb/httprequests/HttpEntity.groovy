@@ -1,22 +1,9 @@
 package com.budjb.httprequests
-
-import java.nio.charset.Charset
-
 /**
  * An object that represents a distinct request entity contained in an {@link InputStream},
  * with the accompanying <i>Content-Type</i>.
  */
-class HttpEntity extends InputStream {
-    /**
-     * Default Content-Type if none is given.
-     */
-    static final String DEFAULT_CONTENT_TYPE = 'application/octet-stream'
-
-    /**
-     * Default character set if none is given.
-     */
-    static final String DEFAULT_CHARACTER_SET = Charset.defaultCharset().toString()
-
+class HttpEntity implements Closeable {
     /**
      * InputStream containing the request entity.
      */
@@ -25,12 +12,12 @@ class HttpEntity extends InputStream {
     /**
      * Content-Type of the entity.
      */
-    String contentType
+    ContentType contentType
 
     /**
-     * Character set of the entity.
+     * Entity buffer.
      */
-    String charset
+    private byte[] buffer
 
     /**
      * Constructor.
@@ -38,7 +25,7 @@ class HttpEntity extends InputStream {
      * @param inputStream An {@link InputStream} containing the entity.
      */
     HttpEntity(InputStream inputStream) {
-        this(inputStream, DEFAULT_CONTENT_TYPE, DEFAULT_CHARACTER_SET)
+        this(inputStream, ContentType.DEFAULT_CONTENT_TYPE)
     }
 
     /**
@@ -46,70 +33,19 @@ class HttpEntity extends InputStream {
      *
      * @param inputStream An {@link InputStream} containing the entity.
      * @param contentType Content-Type of the entity.
-     * @param charset Character set encoding of the entity.
      */
-    HttpEntity(InputStream inputStream, String contentType, String charset) {
+    HttpEntity(InputStream inputStream, ContentType contentType) {
         if (inputStream == null) {
             throw new IllegalArgumentException("input stream must not be null")
         }
+
         this.inputStream = inputStream
 
         if (!contentType) {
-            contentType = DEFAULT_CONTENT_TYPE
+            contentType = ContentType.DEFAULT_CONTENT_TYPE
         }
         this.contentType = contentType
 
-        if (!charset) {
-            charset = DEFAULT_CHARACTER_SET
-        }
-        this.charset = charset
-    }
-
-    /**
-     * Reads the next byte of data from the input stream. The value byte is
-     * returned as an <code>int</code> in the range <code>0</code> to
-     * <code>255</code>. If no byte is available because the end of the stream
-     * has been reached, the value <code>-1</code> is returned. This method
-     * blocks until input data is available, the end of the stream is detected,
-     * or an exception is thrown.
-     *
-     * <p> A subclass must provide an implementation of this method.
-     *
-     * @return the next byte of data, or <code>-1</code> if the end of the
-     *             stream is reached.
-     * @exception IOException  if an I/O error occurs.
-     */
-    @Override
-    int read() throws IOException {
-        return inputStream.read()
-    }
-
-    /**
-     * Returns whether mark is supported.
-     *
-     * @return Whether mark is supported.
-     */
-    @Override
-    boolean markSupported() {
-        return inputStream.markSupported()
-    }
-
-    /**
-     * Marks the current position in the input stream up to <code>readlimit</code> bytes.
-     *
-     * @param readlimit Number of bytes before the mark becomes invalid.
-     */
-    @Override
-    synchronized void mark(int readlimit) {
-        inputStream.mark(readlimit)
-    }
-
-    /**
-     * Resets the {@link InputStream} to a previously set mark.
-     */
-    @Override
-    synchronized void reset() {
-        inputStream.reset()
     }
 
     /**
@@ -118,7 +54,7 @@ class HttpEntity extends InputStream {
      * @return Whether the entity is buffered.
      */
     boolean isBuffered() {
-        return inputStream instanceof ByteArrayInputStream
+        return buffer != null
     }
 
     /**
@@ -126,30 +62,43 @@ class HttpEntity extends InputStream {
      */
     void buffer() {
         if (!isBuffered()) {
-            InputStream newInputStream = new ByteArrayInputStream(StreamUtils.readBytes(inputStream))
+            buffer = StreamUtils.readBytes(inputStream)
             inputStream.close()
-            inputStream = newInputStream
+            inputStream = null
         }
     }
 
     /**
-     * Returns the Content-Type of the request with the character set appended to it.
+     * Returns the {@link InputStream} containing the entity.
      *
-     * If the Content-Type is not set, <code>null</code> is returned.
-     *
-     * @return Content-Type of the request with the character set appended to it.
+     * @return The {@link InputStream} containing the entity.
      */
-    String getFullContentType() {
-        String contentType = this.contentType
-
-        if (!contentType) {
-            contentType = 'application/octet-stream'
+    InputStream getInputStream() {
+        if (buffer) {
+            return new ByteArrayInputStream(buffer)
         }
-
-        if (charset) {
-            contentType += ";charset=${charset}"
+        else {
+            return inputStream
         }
+    }
 
-        return contentType
+    /**
+     * Closes this stream and releases any system resources associated
+     * with it. If the stream is already closed then invoking this
+     * method has no effect.
+     *
+     * <p> As noted in {@link AutoCloseable#close()}, cases where the
+     * close may fail require careful attention. It is strongly advised
+     * to relinquish the underlying resources and to internally
+     * <em>mark</em> the {@code Closeable} as closed, prior to throwing
+     * the {@code IOException}.
+     *
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    void close() throws IOException {
+        if (inputStream) {
+            inputStream.close()
+        }
     }
 }

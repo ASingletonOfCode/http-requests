@@ -82,7 +82,7 @@ class MockHttpClient extends AbstractHttpClient {
 
         if (entity) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            transmit(entity, filterOutputStream(context, outputStream))
+            transmit(entity.inputStream, filterOutputStream(context, outputStream))
             requestBuffer = outputStream.toByteArray()
         }
 
@@ -91,7 +91,14 @@ class MockHttpClient extends AbstractHttpClient {
             contentType += ";charset=${charset}"
         }
 
-        return new MockHttpResponse(context.request, converterManager, status, headers, contentType, responseInputStream)
+        return new MockHttpResponse(
+            context.request,
+            converterManager,
+            status,
+            headers,
+            contentType,
+            responseInputStream
+        )
     }
 
     /**

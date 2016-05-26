@@ -70,7 +70,7 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
         }
 
         if (entity && httpRequest instanceof HttpEntityEnclosingRequestBase) {
-            org.apache.http.HttpEntity httpEntity = new InputStreamEntity(entity) {
+            org.apache.http.HttpEntity httpEntity = new InputStreamEntity(entity.getInputStream()) {
                 @Override
                 public void writeTo(final OutputStream outstream) throws IOException {
                     OutputStream filtered = filterOutputStream(context, outstream)
@@ -84,7 +84,7 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
                     filtered.close()
                 }
             }
-            httpEntity.setContentType(entity.getFullContentType())
+            httpEntity.setContentType(entity.getContentType().toString())
             httpRequest.setEntity(httpEntity)
         }
 

@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.ContentType
 import com.budjb.httprequests.converter.EntityWriter
 
 /**
@@ -29,8 +30,8 @@ class GStringEntityWriter implements EntityWriter {
      * @return Content-Type of the converted object, or null if unknown.
      */
     @Override
-    String getContentType() {
-        return 'text/plain'
+    ContentType getContentType() {
+        return ContentType.TEXT_PLAIN
     }
 
     /**
@@ -50,12 +51,14 @@ class GStringEntityWriter implements EntityWriter {
      * If an error occurs, null may be returned so that another converter may attempt conversion.
      *
      * @param entity Entity object to convert into a byte array.
-     * @param characterSet The character set of the request.
+     * @param contentType Content-Type of the entity.
      * @return An {@link InputStream} containing the converted entity.
      * @throws Exception when an unexpected error occurs.
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
+    InputStream write(Object entity, ContentType contentType) throws Exception {
+        String characterSet = contentType?.charset ?: ContentType.DEFAULT_SYSTEM_CHARACTER_SET
+
         return new ByteArrayInputStream(entity.toString().getBytes(characterSet))
     }
 }

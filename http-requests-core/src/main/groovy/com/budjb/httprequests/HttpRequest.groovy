@@ -26,19 +26,75 @@ class HttpRequest implements Cloneable {
      */
     private class EntityDSLDelegate {
         /**
+         * Whether a closure is in a contentType method call.
+         */
+        private inContentType
+
+        /**
          * Request entity.
          */
         Object entity
 
         /**
-         * Request entity Content-Type.
+         * Content-Type of the request.
          */
-        String contentType
+        ContentType contentType
 
         /**
-         * Character set of the entity.
+         * Sets the content type with the given string.
+         *
+         * @param contentType Content type.
          */
+        void setContentType(String contentType) {
+            this.contentType = new ContentType(contentType)
+        }
+
+        /**
+         * Sets the content type.
+         *
+         * @param contentType Content type.
+         */
+        void setContentType(ContentType contentType) {
+            this.contentType = contentType
+        }
+
+        /**
+         * DSL to set the content type.
+         *
+         * @param closure Closure to configure the content type.
+         */
+        void contentType(@DelegatesTo(ContentTypeDSLDelegate) Closure closure) {
+            if (inContentType) {
+                throw new IllegalStateException('can not configure a Content-Type while already in contentType()')
+            }
+            inContentType = true
+            ContentTypeDSLDelegate delegate = new ContentTypeDSLDelegate()
+            closure = closure.clone() as Closure
+            closure.delegate = delegate
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure.call()
+            inContentType = false
+
+            if (delegate.type) {
+                ContentType contentType = new ContentType(delegate.type)
+                if (delegate.charset) {
+                    contentType.setCharset(delegate.charset)
+                }
+                if (delegate.parameters) {
+                    contentType.setParameters(delegate.parameters)
+                }
+                this.contentType = contentType
+            }
+        }
+    }
+
+    /**
+     * A delegate for DSL-based Content-Type.
+     */
+    private class ContentTypeDSLDelegate {
+        String type
         String charset
+        Map<String, String> parameters = [:]
     }
 
     /**
@@ -508,7 +564,7 @@ class HttpRequest implements Cloneable {
         inEntity = false
 
         if (delegate.entity != null) {
-            setEntity(converterManager.write(delegate.entity, delegate.contentType, delegate.charset))
+            setEntity(converterManager.write(delegate.entity, delegate.contentType,))
         }
     }
 
@@ -519,7 +575,7 @@ class HttpRequest implements Cloneable {
      * @return The object this method was called on.
      */
     HttpRequest setEntity(Object entity) {
-        return setEntity(converterManager.write(entity, null, null))
+        return setEntity(converterManager.write(entity, null))
     }
 
     /**

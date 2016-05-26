@@ -15,6 +15,8 @@
  */
 package com.budjb.httprequests.reference
 
+import com.budjb.httprequests.ContentType
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.HttpRequest
 import com.budjb.httprequests.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
@@ -40,7 +42,6 @@ class ReferenceHttpResponse extends HttpResponse {
         this.httpURLConnection = connection
 
         setStatus(connection.getResponseCode())
-        setContentType(connection.getContentType())
         setHeaders(connection.getHeaderFields())
 
         if (connection.getDoInput()) {
@@ -49,15 +50,29 @@ class ReferenceHttpResponse extends HttpResponse {
                 inputStream = connection.getInputStream()
             }
 
-            if (inputStream != null) {
-                byte read = inputStream.read()
+            inputStream = getNonEmptyInputStream(inputStream)
 
-                if (read != -1) {
-                    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream)
-                    pushbackInputStream.unread(read)
-                    setEntity(pushbackInputStream)
-                }
+            if (inputStream) {
+                setEntity(new HttpEntity(
+                    inputStream,
+                    new ContentType(connection.getHeaderField('Content-Type'))
+                ))
+            }
+            else {
+                close()
             }
         }
+        else {
+            close()
+        }
+    }
+
+    /**
+     * Closes the HTTP response and its underlying resources.
+     */
+    @Override
+    void close() throws IOException {
+        super.close()
+        httpURLConnection.disconnect()
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.ContentType
 import com.budjb.httprequests.converter.EntityWriter
 import groovy.json.JsonBuilder
 
@@ -30,8 +31,8 @@ class JsonEntityWriter implements EntityWriter {
      * @return Content-Type of the converted object, or null if unknown.
      */
     @Override
-    String getContentType() {
-        return 'application/json'
+    ContentType getContentType() {
+        return ContentType.APPLICATION_JSON
     }
 
     /**
@@ -51,12 +52,15 @@ class JsonEntityWriter implements EntityWriter {
      * If an error occurs, null may be returned so that another converter may attempt conversion.
      *
      * @param entity Entity object to convert into a byte array.
-     * @param characterSet The character set of the request.
+     * @param contentType Content-Type of the entity.
      * @return An {@link InputStream} containing the converted entity.
      * @throws Exception when an unexpected error occurs.
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
-        return new ByteArrayInputStream(new JsonBuilder(entity).toString().getBytes(characterSet))
+    InputStream write(Object entity, ContentType contentType) throws Exception {
+        return new ByteArrayInputStream(
+            new JsonBuilder(entity).toString()
+                .getBytes(contentType?.charset ?: ContentType.DEFAULT_SYSTEM_CHARACTER_SET)
+        )
     }
 }

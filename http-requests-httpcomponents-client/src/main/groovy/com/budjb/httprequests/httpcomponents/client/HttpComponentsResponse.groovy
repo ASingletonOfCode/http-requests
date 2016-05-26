@@ -15,10 +15,11 @@
  */
 package com.budjb.httprequests.httpcomponents.client
 
+import com.budjb.httprequests.ContentType
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.HttpRequest
 import com.budjb.httprequests.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
-import org.apache.http.HttpEntity
 import org.apache.http.client.methods.CloseableHttpResponse
 
 /**
@@ -46,13 +47,13 @@ class HttpComponentsResponse extends HttpResponse {
             addHeader(it.getName(), it.getValue())
         }
 
-        HttpEntity entity = response.getEntity()
+        org.apache.http.HttpEntity entity = response.getEntity()
         if (entity) {
-            if (entity.getContentType()) {
-                setContentType(entity.getContentType().getValue())
+            InputStream inputStream = getNonEmptyInputStream(entity.getContent())
+            if (inputStream) {
+                setEntity(new HttpEntity(inputStream, new ContentType(entity.getContentType()?.getValue())))
             }
-            setEntity(entity.getContent())
-            if (request.isBufferResponseEntity()) {
+            else {
                 close()
             }
         }

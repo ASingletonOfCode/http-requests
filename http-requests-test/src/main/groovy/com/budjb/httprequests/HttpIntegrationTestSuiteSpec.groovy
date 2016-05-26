@@ -674,7 +674,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         }
 
         then:
-        StreamUtils.readString(new GZIPInputStream(response.getEntity()), 'UTF-8') == 'Hello, world!'
+        StreamUtils.readString(new GZIPInputStream(response.getEntity().getInputStream()), 'UTF-8') == 'Hello, world!'
     }
 
     def 'Ensure the LoggingFilter does not cause interruptions to HTTP requests.'() {
@@ -712,8 +712,8 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         }
 
         then:
-        response.contentType == 'text/plain'
-        response.charset == charset
+        response.entity.contentType.fullType == 'text/plain'
+        response.entity.contentType.charset == charset
         response.getEntity(String) == output
 
         where:
@@ -732,7 +732,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
         then:
         response.getEntity(String) == output
-        response.contentType == contentType
+        response.entity.contentType.fullType == contentType
 
         when:
         def read = response.getEntity(readType)

@@ -37,7 +37,16 @@ class MockHttpResponse extends HttpResponse {
 
         setStatus(status)
         setHeaders(headers)
-        setContentType(contentType)
-        setEntity(entity)
+
+        entity = getNonEmptyInputStream(entity)
+
+        if (entity) {
+            if (contentType) {
+                setEntity(new HttpEntity(entity, new ContentType(contentType)))
+            }
+            else {
+                setEntity(new HttpEntity(entity))
+            }
+        }
     }
 }

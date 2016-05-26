@@ -81,7 +81,7 @@ class JerseyHttpClient extends AbstractHttpClient {
 
         Entity<InputStream> jerseyEntity = null
         if (entity) {
-            jerseyEntity = Entity.entity(entity, entity.getFullContentType())
+            jerseyEntity = Entity.entity(entity.getInputStream(), entity.getContentType().toString())
         }
 
         Response clientResponse

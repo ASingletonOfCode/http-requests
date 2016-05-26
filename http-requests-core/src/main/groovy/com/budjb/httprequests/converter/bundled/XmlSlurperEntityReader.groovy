@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.converter.EntityReader
 import groovy.util.slurpersupport.GPathResult
 
@@ -38,14 +39,12 @@ class XmlSlurperEntityReader implements EntityReader {
      *
      * If an error occurs, null may be returned so that another converter can attempt a conversion.
      *
-     * @param entity Entity as an {@link java.io.InputStream}.
-     * @param contentType Content-Type of the entity.
-     * @param charset Character set of the entity.
+     * @param entity Entity as an {@link HttpEntity}.
      * @return The converted entity.
      * @throws java.lang.Exception when an unexpected error occurs during conversion.
      */
     @Override
-    Object read(InputStream entity, String contentType, String charset) throws Exception {
-        return new XmlSlurper(false, false).parse(entity)
+    Object read(HttpEntity entity) throws Exception {
+        return new XmlSlurper(false, false).parse(entity.getInputStream())
     }
 }

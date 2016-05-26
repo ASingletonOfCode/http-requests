@@ -15,6 +15,8 @@
  */
 package com.budjb.httprequests.jersey1
 
+import com.budjb.httprequests.ContentType
+import com.budjb.httprequests.HttpEntity
 import com.budjb.httprequests.HttpRequest
 import com.budjb.httprequests.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
@@ -44,18 +46,28 @@ class JerseyHttpResponse extends HttpResponse {
         setStatus(response.getStatus())
         setHeaders(response.getHeaders())
 
-        if (response.getType()) {
-            setContentType(response.getType().toString())
-        }
-
         if (response.hasEntity()) {
-            setEntity(response.getEntityInputStream())
-            if (request.isBufferResponseEntity()) {
+            InputStream inputStream = getNonEmptyInputStream(response.getEntityInputStream())
+            if (inputStream) {
+                setEntity(new HttpEntity(inputStream, new ContentType(response.getType().toString())))
+            }
+            else {
                 close()
             }
         }
         else {
             close()
         }
+    }
+
+    /**
+     * Closes the HTTP response and its underlying resources.
+     *
+     * @throws IOException
+     */
+    @Override
+    void close() throws IOException {
+        super.close()
+        response.close()
     }
 }

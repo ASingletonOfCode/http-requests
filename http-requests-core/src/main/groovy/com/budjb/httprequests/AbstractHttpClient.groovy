@@ -313,10 +313,6 @@ abstract class AbstractHttpClient implements HttpClient {
         }
 
         while (true) {
-            if (entity != null && entity.isBuffered()) {
-                entity.reset()
-            }
-
             HttpRequest newRequest = request.clone() as HttpRequest
             context.setRequest(newRequest)
             context.setResponse(null)
