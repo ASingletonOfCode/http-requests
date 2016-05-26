@@ -63,7 +63,7 @@ class HttpRequestSpec extends Specification {
             .setBufferResponseEntity(false)
 
         then:
-        request.getAccept() == 'text/plain'
+        request.getAccept().fullType == 'text/plain'
         request.getHeaders() == [foo: ['bar', '1', '2'], hi: ['there']]
         request.getQueryParameters() == [foo: ['bar', '1', '2'], hi: ['there']]
         !request.isSslValidated()
@@ -135,7 +135,7 @@ class HttpRequestSpec extends Specification {
 
         then:
         request.uri == 'https://localhost:8080'
-        request.accept == 'application/json'
+        request.accept.fullType == 'application/json'
         request.connectionTimeout == 10000
         request.readTimeout == 5000
         !request.followRedirects

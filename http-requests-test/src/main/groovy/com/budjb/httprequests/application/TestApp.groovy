@@ -79,12 +79,12 @@ class TestApp {
     }
 
     @RequestMapping(value = '/testAccept', method = RequestMethod.GET)
-    ResponseEntity<String> testAccept(@RequestHeader('Accept') accept) {
+    ResponseEntity<String> testAccept(@RequestHeader('Accept') MediaType accept) {
         String body
         String contentType
         int status = 200
 
-        switch (accept) {
+        switch ("${accept.type}/${accept.subtype}") {
             case "application/json":
                 body = '{"foo":"bar"}'
                 contentType = 'application/json'

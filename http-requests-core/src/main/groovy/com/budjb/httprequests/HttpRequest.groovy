@@ -115,7 +115,7 @@ class HttpRequest implements Cloneable {
     /**
      * Requested Content-Type of the response.
      */
-    String accept
+    ContentType accept
 
     /**
      * The read timeout of the HTTP connection, in milliseconds. Defaults to 0 (infinity).
@@ -400,6 +400,16 @@ class HttpRequest implements Cloneable {
      * @return The instance of this class the method was called with.
      */
     HttpRequest setAccept(String accept) {
+        return setAccept(new ContentType(accept))
+    }
+
+    /**
+     * Sets the requested Content-Type of the response.
+     *
+     * @param accept Requested Content-Type of the response.
+     * @return The instance of this class the method was called with.
+     */
+    HttpRequest setAccept(ContentType accept) {
         this.accept = accept
         return this
     }
@@ -516,7 +526,7 @@ class HttpRequest implements Cloneable {
         HttpRequest request = new HttpRequest(converterManager)
 
         request.setUri(getUri())
-        request.setAccept(getAccept())
+        request.setAccept(getAccept() as ContentType)
         request.setBufferResponseEntity(isBufferResponseEntity())
         request.setConnectionTimeout(getConnectionTimeout())
         request.setReadTimeout(getReadTimeout())

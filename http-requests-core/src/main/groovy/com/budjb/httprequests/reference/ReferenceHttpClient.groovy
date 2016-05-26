@@ -55,7 +55,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
         }
 
         if (request.getAccept()) {
-            connection.setRequestProperty('Accept', request.getAccept())
+            connection.setRequestProperty('Accept', request.getAccept().toString())
         }
 
         request.getHeaders().each { key, values ->
