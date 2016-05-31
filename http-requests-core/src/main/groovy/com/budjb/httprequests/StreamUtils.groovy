@@ -15,6 +15,9 @@
  */
 package com.budjb.httprequests
 
+/**
+ * A helper class containing methods that pertain to Java streams.
+ */
 abstract class StreamUtils {
     /**
      * Reads a <code>String</code> from the given input stream with the given character set.

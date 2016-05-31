@@ -15,11 +15,7 @@
  */
 package com.budjb.httprequests.filter.bundled
 
-import com.budjb.httprequests.HttpContext
-import com.budjb.httprequests.HttpEntity
-import com.budjb.httprequests.HttpMethod
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.*
 import com.budjb.httprequests.filter.HttpClientLifecycleFilter
 import com.budjb.httprequests.filter.HttpClientRequestEntityFilter
 import com.budjb.httprequests.filter.HttpClientResponseEntityFilter
@@ -103,16 +99,16 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
     protected void logRequestInformation(HttpContext context, StringBuilder stringBuilder) {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
-        HttpEntity entity = context.getEntity()
+        HttpEntity entity = request.getEntity()
 
         stringBuilder.append('Sending HTTP client request with the following data:\n')
         stringBuilder.append("> ${method.toString()} ${new URI(request.getUri()).toASCIIString()}\n")
 
         if (entity && entity.getContentType()) {
-            stringBuilder.append("> Content-Type: ${entity.getFullContentType()}\n")
+            stringBuilder.append("> Content-Type: ${entity.getContentType().toString()}\n")
         }
         if (request.getAccept()) {
-            stringBuilder.append("> Accept: ${request.getAccept()}\n")
+            stringBuilder.append("> Accept: ${request.getAccept().toString()}\n")
         }
 
         request.getHeaders().each { key, values ->

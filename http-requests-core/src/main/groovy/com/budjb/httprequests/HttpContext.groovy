@@ -25,11 +25,6 @@ class HttpContext {
     private final Map<String, Object> data = [:]
 
     /**
-     * Request entity.
-     */
-    HttpEntity entity
-
-    /**
      * The request configuration
      */
     HttpRequest request
