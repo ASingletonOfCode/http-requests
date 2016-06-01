@@ -55,7 +55,7 @@ class HttpEntity implements Closeable {
             throw new IllegalArgumentException("input stream must not be null")
         }
 
-        this.inputStream = inputStream
+        this.inputStream = new EntityInputStream(inputStream)
 
         if (!contentType) {
             contentType = ContentType.DEFAULT_CONTENT_TYPE

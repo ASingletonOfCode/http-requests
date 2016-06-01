@@ -789,4 +789,22 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         response.hasEntity()
         response.getEntity(String) == 'test payload'
     }
+
+    def 'When an un-buffered response is closed, further attempts to read the entity results in an IOException'() {
+        when:
+        def response = httpClientFactory.createHttpClient().get {
+            uri = "${baseUrl}/testBasicGet"
+            bufferResponseEntity = false
+        }
+        response.getEntity(String)
+
+        then:
+        notThrown Exception
+
+        when:
+        response.getEntity(String)
+
+        then:
+        thrown IOException
+    }
 }
