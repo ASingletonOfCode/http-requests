@@ -22,8 +22,7 @@ import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.reference.ReferenceHttpClientFactory
 import grails.plugins.Plugin
 import groovy.util.logging.Slf4j
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 @Slf4j
 class HttpRequestsGrailsGrailsPlugin extends Plugin {
@@ -81,7 +80,7 @@ class HttpRequestsGrailsGrailsPlugin extends Plugin {
     Closure doWithSpring() {
         { ->
             if (autoLoadFactory()) {
-                httpClientFactory(scanClasspathForProvider(), autoLoadConverters()) { bean ->
+                httpClientFactory(ReferenceHttpClientFactory, autoLoadConverters()) { bean ->
                     bean.autowire = true
                 }
             }
@@ -105,59 +104,19 @@ class HttpRequestsGrailsGrailsPlugin extends Plugin {
      */
     @Override
     void doWithApplicationContext() {
-        HttpClientFactory httpClientFactory = applicationContext.getBean('httpClientFactory', HttpClientFactory)
+        if (applicationContext.containsBean('httpClientFactory')) {
+            HttpClientFactory httpClientFactory = applicationContext.getBean('httpClientFactory', HttpClientFactory)
 
-        grailsApplication.getArtefacts(HttpClientFilterArtefactHandler.TYPE).each {
-            log.debug("Adding HttpClientFilter '${it.getClazz().getSimpleName()}'")
-            httpClientFactory.addFilter(applicationContext.getBean(it.getClazz().getName(), HttpClientFilter))
-        }
+            grailsApplication.getArtefacts(HttpClientFilterArtefactHandler.TYPE).each {
+                log.debug("Adding HttpClientFilter '${it.getClazz().getSimpleName()}'")
+                httpClientFactory.addFilter(applicationContext.getBean(it.getClazz().getName(), HttpClientFilter))
+            }
 
-        grailsApplication.getArtefacts(EntityConverterArtefactHandler.TYPE).each {
-            log.debug("Adding EntityConverter '${it.getClazz().getSimpleName()}'")
-            httpClientFactory.addEntityConverter(applicationContext.getBean(it.getClazz().getName(), EntityConverter))
-        }
-    }
-
-    /**
-     * Scans the classpath for instances of {@link HttpClientFactory}. If only one is found, it is returned.
-     * Otherwise, an {@link IllegalStateException} is thrown. By default, the <code>com.budjb.httprequests</code>
-     * package and subpackages are scanned, but additional packages can be configured with the application
-     * configuration key <code>httprequests.scanPackages</code>, which should be a list.
-     *
-     * @return The {@link HttpClientFactory} to register as a bean iff only one is found.
-     * @throws IllegalStateException when 0 or more than 1 {@link HttpClientFactory} implementations are found.
-     */
-    private Class<? extends HttpClientFactory> scanClasspathForProvider() throws IllegalStateException {
-        List<String> packages = ['com.budjb.httprequests']
-        packages.addAll(getAdditionalPackages())
-
-        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false)
-        provider.addIncludeFilter(new AssignableTypeFilter(HttpClientFactory))
-        provider.addExcludeFilter(new AssignableTypeFilter(ReferenceHttpClientFactory))
-
-        List<Class<? extends HttpClientFactory>> candidates = []
-
-        for (String pkg : packages) {
-            provider.findCandidateComponents(pkg).each {
-                log.debug("Located HttpClientFactory provider: ${it.getBeanClassName()}")
-                candidates.add(Class.forName(it.getBeanClassName()) as Class<? extends HttpClientFactory>)
+            grailsApplication.getArtefacts(EntityConverterArtefactHandler.TYPE).each {
+                log.debug("Adding EntityConverter '${it.getClazz().getSimpleName()}'")
+                httpClientFactory.addEntityConverter(applicationContext.getBean(it.getClazz().getName(), EntityConverter))
             }
         }
-
-        Class<? extends HttpClientFactory> clazz
-        if (candidates.size() == 0) {
-            log.debug("Could not locate an optional HttpClientFactory provider.")
-            clazz = ReferenceHttpClientFactory
-        }
-        else if (candidates.size() > 1) {
-            throw new IllegalStateException("multiple providers with type 'com.budjb.httprequests.HttpClientFactory' found on the classpath: ${candidates*.simpleName.join(', ')}")
-        }
-        else {
-            clazz = candidates.get(0)
-        }
-
-        log.debug("Registering HttpClientFactory provider: ${clazz.getName()}")
-        return clazz
     }
 
     /**
@@ -176,18 +135,5 @@ class HttpRequestsGrailsGrailsPlugin extends Plugin {
      */
     boolean autoLoadFactory() {
         return config.httprequests.autoLoadFactory != false
-    }
-
-    /**
-     * Return the list of additional classpath packages to scan for {@link HttpClientFactory}
-     * implementations.
-     *
-     * @return The list of additional classpath packages to scan.
-     */
-    List<String> getAdditionalPackages() {
-        if (config.httprequests.scanPackages instanceof List) {
-            return config.httprequests.scanPackages
-        }
-        return []
     }
 }
