@@ -38,6 +38,18 @@ class HttpEntity implements Closeable {
     /**
      * Constructor.
      *
+     * @param contentType
+     */
+    protected HttpEntity(ContentType contentType) {
+        if (!contentType) {
+            contentType = ContentType.DEFAULT_CONTENT_TYPE
+        }
+        setContentType(contentType)
+    }
+
+    /**
+     * Constructor.
+     *
      * @param inputStream An {@link InputStream} containing the entity.
      */
     HttpEntity(InputStream inputStream) {
@@ -51,17 +63,13 @@ class HttpEntity implements Closeable {
      * @param contentType Content-Type of the entity.
      */
     HttpEntity(InputStream inputStream, ContentType contentType) {
+        this((ContentType)contentType)
+
         if (inputStream == null) {
             throw new IllegalArgumentException("input stream must not be null")
         }
 
-        this.inputStream = new EntityInputStream(inputStream)
-
-        if (!contentType) {
-            contentType = ContentType.DEFAULT_CONTENT_TYPE
-        }
-        this.contentType = contentType
-
+        setInputStream(inputStream)
     }
 
     /**
@@ -99,6 +107,15 @@ class HttpEntity implements Closeable {
     }
 
     /**
+     * Sets the input stream of the entity.
+     *
+     * @param inputStream The {@link InputStream} containing the entity.
+     */
+    void setInputStream(InputStream inputStream) {
+        this.inputStream = new EntityInputStream(inputStream)
+    }
+
+    /**
      * Closes this stream and releases any system resources associated
      * with it. If the stream is already closed then invoking this
      * method has no effect.
@@ -116,5 +133,14 @@ class HttpEntity implements Closeable {
         if (inputStream) {
             inputStream.close()
         }
+    }
+
+    /**
+     * Sets the content type of the entity.
+     *
+     * @param contentType
+     */
+    void setContentType(ContentType contentType) {
+        this.contentType = contentType
     }
 }

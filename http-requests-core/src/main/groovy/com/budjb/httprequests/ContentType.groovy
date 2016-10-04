@@ -47,6 +47,11 @@ class ContentType {
     static final ContentType APPLICATION_X_WWW_FORM_URLENCODED = new ContentType('application/x-www-form-urlencoded')
 
     /**
+     * Mixed multipart.
+     */
+    static final ContentType MULTIPART_MIXED = new ContentType('multipart/mixed')
+
+    /**
      * Default Content-Type for HTTP requests (application/octet-stream).
      */
     static final ContentType DEFAULT_CONTENT_TYPE = APPLICATION_OCTET_STREAM

@@ -536,6 +536,8 @@ class HttpRequest implements Cloneable {
         request.setHeaders(copyMultivalMap(getHeaders()))
         request.setQueryParameters(copyMultivalMap(getQueryParameters()))
 
+        request.setEntity(getEntity())
+
         return request
     }
 

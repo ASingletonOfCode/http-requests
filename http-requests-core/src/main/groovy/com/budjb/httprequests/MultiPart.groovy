@@ -15,51 +15,139 @@
  */
 package com.budjb.httprequests
 
-import com.budjb.httprequests.converter.EntityConverterManager
+class MultiPart extends HttpEntity {
+    class MultiPartInputStream extends InputStream {
+        /**
+         * Reads the next byte of data from the input stream. The value byte is
+         * returned as an <code>int</code> in the range <code>0</code> to
+         * <code>255</code>. If no byte is available because the end of the stream
+         * has been reached, the value <code>-1</code> is returned. This method
+         * blocks until input data is available, the end of the stream is detected,
+         * or an exception is thrown.
+         *
+         * <p> A subclass must provide an implementation of this method.
+         *
+         * @return the next byte of data, or <code>-1</code> if the end of the
+         *             stream is reached.
+         * @exception IOException  if an I/O error occurs.
+         */
+        @Override
+        int read() throws IOException {
+            if (!boundaryStream) {
+                boundaryStream = new ByteArrayInputStream(("\n" + boundary).getBytes())
+                boundaryStream.mark(1024)
+            }
 
-class MultiPart extends InputStream {
-    /**
-     * Entity converter manager.
-     */
-    EntityConverterManager converterManager
+            while (currentEntity < entities.size()) {
+                int ch = boundaryStream.read()
+                if (ch == -1) {
+                    if (!entityNewline) {
+                        entityNewline = true
+                        return 10 // "\n"
+                    }
+                    ch = entities.get(currentEntity).getInputStream().read()
+                }
+                if (ch == -1) {
+                    entityNewline = false
+                    boundaryStream.reset()
+                    currentEntity++
+                }
+                else {
+                    return ch
+                }
+            }
 
-    /**
-     * Entries in the multipart entity.
-     */
-    List<HttpEntity> entities = []
+            if (finalBoundaryCount >= 2) {
+                return -1
+            }
+
+            int ch = boundaryStream.read()
+            if (ch == -1) {
+                finalBoundaryCount++
+                return 45 // "-"
+            }
+            else {
+                return ch
+            }
+        }
+
+        /**
+         * Disable mark support.
+         *
+         * @return <code>false</code>, always.
+         */
+        @Override
+        boolean markSupported() {
+            return false
+        }
+    }
 
     /**
      * Boundary of the entity.
      */
-    String boundary
+    String boundary = "------${System.currentTimeMillis()}"
+
+    /**
+     * Boundary input stream.
+     */
+    ByteArrayInputStream boundaryStream
+
+    /**
+     * Entities that will be output.
+     */
+    List<HttpEntity> entities = []
+
+    /**
+     * Current entity index.
+     */
+    int currentEntity = 0
+
+    /**
+     * Whether the newline following a boundary has been read.
+     */
+    boolean entityNewline = false
+
+    /**
+     * Whether the final boundary has been printed.
+     */
+    int finalBoundaryCount = 0
+
+    protected MultiPartInputStream multiPartInputStream
+
+    /**
+     * Constructor.
+     */
+    MultiPart() {
+        super(ContentType.MULTIPART_MIXED)
+
+        multiPartInputStream = new MultiPartInputStream()
+        setInputStream(multiPartInputStream)
+    }
 
     /**
      * Constructor.
      *
-     * @param converterManager Converter manager.
+     * @param entities
      */
-    MultiPart(EntityConverterManager converterManager) {
-        this.converterManager = converterManager
-        this.boundary = createBoundary()
+    MultiPart(List<HttpEntity> entities) {
+        this()
+
+        entities.each {
+            add(it)
+        }
     }
 
     /**
-     * Reads the next byte of data from the input stream. The value byte is
-     * returned as an <code>int</code> in the range <code>0</code> to
-     * <code>255</code>. If no byte is available because the end of the stream
-     * has been reached, the value <code>-1</code> is returned. This method
-     * blocks until input data is available, the end of the stream is detected,
-     * or an exception is thrown.
+     * Constructor.
      *
-     * <p> A subclass must provide an implementation of this method.
-     *
-     * @return the next byte of data, or <code>-1</code> if the end of the
-     *             stream is reached.
-     * @exception IOException  if an I/O error occurs.
+     * @param entities
      */
-    @Override
-    int read() throws IOException {
-        return 0 // TODO: make this happen
+    MultiPart(HttpEntity... entities) {
+        this()
+
+        entities.each {
+            add(it)
+        }
     }
 
     /**
@@ -75,33 +163,29 @@ class MultiPart extends InputStream {
     }
 
     /**
-     * Add a multipart entry.
+     * Sets the content type of the entity.
      *
-     * @param object Object to add to the multipart entity.
-     * @param contentType Content-Type of the multipart entry.
-     * @param charset Character set of the entity.
-     * @return The object this method was called on.
+     * @param contentType
      */
-    MultiPart add(Object object, ContentType contentType) {
-        return add(converterManager.write(object, contentType))
+    @Override
+    void setContentType(ContentType contentType) {
+        if (contentType.type != 'multipart') {
+            throw new IllegalArgumentException('Content-Type of a multi-part entity must be of the primary type "multipart"')
+        }
+        contentType.setParameter('boundary', boundary)
+
+        super.setContentType(contentType)
     }
 
     /**
-     * Return a new boundary based on the current system time.
+     * Returns the content type of the request.
      *
      * @return
      */
-    String createBoundary() {
-        return "------${System.currentTimeMillis()}"
-    }
-
-    /**
-     * Disable mark support.
-     *
-     * @return <code>false</code>, always.
-     */
     @Override
-    boolean markSupported() {
-        return false
+    ContentType getContentType() {
+        ContentType type = super.getContentType()
+        type.setParameter('boundary', boundary)
+        return type
     }
 }

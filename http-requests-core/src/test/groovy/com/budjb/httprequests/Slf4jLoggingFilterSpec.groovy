@@ -113,8 +113,9 @@ class Slf4jLoggingFilterSpec extends Specification {
         response.status == 200
         !response.getEntity().isBuffered()
         response.getEntity().getClass() == HttpEntity
-        response.getEntity().inputStream.getClass() == BufferedInputStream
-        response.getEntity().inputStream.count == 10001
+        response.getEntity().inputStream.getClass() == EntityInputStream
+        response.getEntity().inputStream.source.getClass() == BufferedInputStream
+        response.getEntity().inputStream.source.count == 10001
         response.getEntity(String) == content
     }
 }

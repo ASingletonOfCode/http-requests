@@ -167,4 +167,31 @@ abstract class AbstractHttpClientFactory implements HttpClientFactory {
     void clearEntityConverters() {
         converterManager.clear()
     }
+
+
+    /**
+     * Create an {@link HttpEntity} instance for the given input stream and content type.
+     *
+     * @param inputStream
+     * @param contentType
+     * @return
+     */
+    @Override
+    HttpEntity createEntity(InputStream inputStream, ContentType contentType) {
+        return new HttpEntity(inputStream, contentType)
+    }
+
+    /**
+     * Create an {@link HttpEntity} instance for the given object and content type.
+     * This method will attempt to convert the object with the converters registered
+     * with the factory.
+     *
+     * @param object
+     * @param contentType
+     * @return
+     */
+    @Override
+    HttpEntity createEntity(Object object, ContentType contentType) {
+        return converterManager.write(object, contentType)
+    }
 }

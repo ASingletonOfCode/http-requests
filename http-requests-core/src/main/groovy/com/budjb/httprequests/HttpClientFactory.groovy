@@ -85,4 +85,25 @@ interface HttpClientFactory {
      * Remove all entity converters.
      */
     void clearEntityConverters()
+
+
+    /**
+     * Create an {@link HttpEntity} instance for the given input stream and content type.
+     *
+     * @param inputStream
+     * @param contentType
+     * @return
+     */
+    HttpEntity createEntity(InputStream inputStream, ContentType contentType)
+
+    /**
+     * Create an {@link HttpEntity} instance for the given object and content type.
+     * This method will attempt to convert the object with the converters registered
+     * with the factory.
+     *
+     * @param object
+     * @param contentType
+     * @return
+     */
+    HttpEntity createEntity(Object object, ContentType contentType)
 }

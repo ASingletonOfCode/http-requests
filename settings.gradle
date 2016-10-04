@@ -1,4 +1,3 @@
-include 'http-requests-bom'
 include 'http-requests-core'
 include 'http-requests-test'
 include 'http-requests-documentation'
