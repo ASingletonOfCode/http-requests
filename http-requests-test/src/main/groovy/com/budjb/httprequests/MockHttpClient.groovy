@@ -16,6 +16,7 @@
 package com.budjb.httprequests
 
 import com.budjb.httprequests.converter.EntityConverterManager
+import com.budjb.httprequests.core.HttpEntity
 import com.budjb.httprequests.filter.HttpClientFilterManager
 
 /**
@@ -77,7 +78,7 @@ class MockHttpClient extends AbstractHttpClient {
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity inputStream) throws IOException {
         httpContext = context
 
         if (inputStream) {

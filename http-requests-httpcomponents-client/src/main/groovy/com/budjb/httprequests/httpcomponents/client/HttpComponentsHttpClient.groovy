@@ -106,7 +106,6 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
             .build()
 
         HttpClientBuilder builder = HttpClients.custom()
-
         builder.setDefaultRequestConfig(requestConfig)
 
         if (!request.isSslValidated()) {

@@ -18,6 +18,9 @@ package com.budjb.httprequests
 import com.budjb.httprequests.converter.EntityConverter
 import com.budjb.httprequests.converter.EntityConverterManager
 import com.budjb.httprequests.converter.EntityWriter
+import com.budjb.httprequests.core.HttpEntity
+
+import com.budjb.httprequests.core.ObjectHttpEntity
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.filter.HttpClientFilterManager
@@ -51,7 +54,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * @throws IOException
      */
     protected
-    abstract HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException
+    abstract HttpResponse doExecute(HttpContext context, HttpEntity inputStream) throws IOException
 
     /**
      * Execute an HTTP request with the given method and request parameters and without a request entity.
@@ -90,7 +93,7 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse execute(HttpMethod method, HttpRequest request, InputStream inputStream) throws IOException {
-        return run(method, request, inputStream)
+        return execute(method, request, new HttpEntity(inputStream))
     }
 
     /**
@@ -123,7 +126,25 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(method, request, converterManager.write(request, entity))
+        return execute(method, request, new ObjectHttpEntity(entity))
+    }
+
+    /**
+     * Executes an HTTP request with the given method, request parameters, and entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param method HTTP method to use with the HTTP request.
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return run(method, request, entity)
     }
 
     /**
@@ -141,6 +162,25 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse execute(HttpMethod method, Object entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(method, HttpRequest.build(requestClosure), entity)
+    }
+
+    /**
+     * Executes an HTTP request with the given method, closure to configure the request, and entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param method HTTP method to use with the HTTP request.
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpEntity entity,
                          @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
         return execute(method, HttpRequest.build(requestClosure), entity)
     }
@@ -255,6 +295,36 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
+     * Perform an HTTP POST request with the given entity.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity An {@link HttpEntity} containing the response body.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     */
+    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException {
+        return execute(HttpMethod.POST, request, entity)
+    }
+
+    /**
+     * Perform an HTTP POST request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse post(HttpEntity entity,
+                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.POST, entity, requestClosure)
+    }
+
+    /**
      * Perform an HTTP PUT request without a request entity.
      *
      * @param request Request properties to use with the HTTP request.
@@ -335,6 +405,41 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse put(Object entity,
+                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, entity, requestClosure)
+    }
+
+    /**
+     * Perform an HTTP PUT request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, request, entity)
+    }
+
+    /**
+     * Perform an HTTP PUT request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse put(HttpEntity entity,
                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
         return execute(HttpMethod.PUT, entity, requestClosure)
     }
@@ -449,6 +554,41 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
+     * Perform an HTTP OPTIONS request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, request, entity)
+    }
+
+    /**
+     * Perform an HTTP OPTIONS request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    @Override
+    HttpResponse options(HttpEntity entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, entity, requestClosure)
+    }
+
+    /**
      * Perform an HTTP HEAD request.
      *
      * @param request Request properties to use with the HTTP request.
@@ -550,9 +690,16 @@ abstract class AbstractHttpClient implements HttpClient {
      * @param entity Request entity.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      */
-    protected HttpResponse run(HttpMethod method, HttpRequest request, InputStream entity) {
+    protected HttpResponse run(HttpMethod method, HttpRequest request, HttpEntity entity) {
         HttpContext context = new HttpContext()
         context.setMethod(method)
+
+        /*
+        HttpEntity inputStreamHttpEntity = null
+        if (entity != null) {
+            inputStreamHttpEntity = null // TODO: Pass conversion to the client implementation now!!!
+        }
+        */
 
         // Requests whose client contains a retry filter must have their entity buffered.
         // If it is not, the retried request will either throw an error due to the entity
@@ -560,11 +707,11 @@ abstract class AbstractHttpClient implements HttpClient {
         // that could potentially be retried are automatically read into a ByteArrayInputStream
         // so that it can be transmitted more than once.
         if (entity != null && filterManager.hasRetryFilters()) {
-            entity = new ByteArrayInputStream(StreamUtils.readBytes(entity))
+            entity.buffer()
         }
 
         while (true) {
-            if (entity != null && entity.markSupported()) {
+            if (entity.isBuffered()) {
                 entity.reset()
             }
 
@@ -608,7 +755,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * @param context HTTP request context.
      * @param outputStream Output stream of the request.
      */
-    protected OutputStream filterOutputStream(HttpContext context, OutputStream outputStream) {
+    OutputStream filterOutputStream(HttpContext context, OutputStream outputStream) {
         outputStream = filterManager.filterRequestEntity(context, outputStream)
 
         filterManager.onRequest(context, outputStream)
@@ -683,5 +830,15 @@ abstract class AbstractHttpClient implements HttpClient {
                 return true
             }
         }
+    }
+
+    @Override
+    InputStream convert(Object object) {
+        return convert(object, null)
+    }
+
+    @Override
+    InputStream convert(Object Object, String characterSet) {
+        return converterManager.convertToInputStream(object, characterSet)
     }
 }

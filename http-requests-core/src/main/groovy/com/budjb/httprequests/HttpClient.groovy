@@ -18,6 +18,9 @@ package com.budjb.httprequests
 import com.budjb.httprequests.converter.EntityConverter
 import com.budjb.httprequests.converter.EntityConverterManager
 import com.budjb.httprequests.converter.EntityWriter
+import com.budjb.httprequests.core.HttpEntity
+import com.budjb.httprequests.core.multipart.MultiPartEntity
+import com.budjb.httprequests.core.multipart.Part
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.filter.HttpClientFilterManager
@@ -101,6 +104,21 @@ interface HttpClient {
     HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException
 
     /**
+     * Executes an HTTP request with the given method, request parameters, and entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param method HTTP method to use with the HTTP request.
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException
+
+    /**
      * Executes an HTTP request with the given method, closure to configure the request, and entity.
      *
      * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
@@ -114,6 +132,22 @@ interface HttpClient {
      * @throws UnsupportedConversionException
      */
     HttpResponse execute(HttpMethod method, Object entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+
+    /**
+     * Executes an HTTP request with the given method, closure to configure the request, and entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param method HTTP method to use with the HTTP request.
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse execute(HttpMethod method, HttpEntity entity,
                          @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
 
     /**
@@ -202,6 +236,31 @@ interface HttpClient {
                       @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
 
     /**
+     * Perform an HTTP POST request with the given entity.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity An {@link HttpEntity} containing the response body.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     */
+    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException
+
+    /**
+     * Perform an HTTP POST request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse post(HttpEntity entity,
+                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+
+    /**
      * Perform an HTTP PUT request without a request entity.
      *
      * @param request Request properties to use with the HTTP request.
@@ -266,7 +325,36 @@ interface HttpClient {
      * @throws UnsupportedConversionException
      */
     HttpResponse put(Object entity,
-                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+
+    /**
+     * Perform an HTTP PUT request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException
+
+    /**
+     * Perform an HTTP PUT request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse put(HttpEntity entity,
+                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
 
     /**
      * Perform an HTTP DELETE request.
@@ -351,7 +439,36 @@ interface HttpClient {
      * @throws UnsupportedConversionException
      */
     HttpResponse options(Object entity,
-                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
+
+    /**
+     * Perform an HTTP OPTIONS request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param request Request properties to use with the HTTP request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException
+
+    /**
+     * Perform an HTTP OPTIONS request with the given entity.
+     *
+     * The entity will be converted if an appropriate {@link EntityWriter} can be found. If no
+     * writer can be found, an {@link UnsupportedConversionException} will be thrown.
+     *
+     * @param entity Request entity.
+     * @param requestClosure Closure that configures the request.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     * @throws UnsupportedConversionException
+     */
+    HttpResponse options(HttpEntity entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException
 
     /**
      * Perform an HTTP HEAD request.
@@ -444,4 +561,10 @@ interface HttpClient {
      * Remove all entity converters.
      */
     void clearEntityConverters()
+
+    MultiPartEntity buildMultiPartEntity(Closure closure)
+
+    InputStream convert(Object object)
+
+    InputStream convert(Object, String characterSet)
 }

@@ -16,6 +16,7 @@
 package com.budjb.httprequests.reference
 
 import com.budjb.httprequests.*
+import com.budjb.httprequests.core.HttpEntity
 
 import javax.net.ssl.HttpsURLConnection
 
@@ -33,7 +34,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
      * @throws IOException
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity inputStream) throws IOException {
         HttpRequest request = context.getRequest()
 
         URI uri = createURI(request)

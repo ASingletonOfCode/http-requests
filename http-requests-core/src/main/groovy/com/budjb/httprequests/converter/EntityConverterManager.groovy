@@ -16,7 +16,8 @@
 package com.budjb.httprequests.converter
 
 import com.budjb.httprequests.EntityInputStream
-import com.budjb.httprequests.HttpRequest
+import com.budjb.httprequests.core.HttpEntity
+import com.budjb.httprequests.core.multipart.Part
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
 
@@ -111,14 +112,13 @@ class EntityConverterManager {
      * the content type for the conversion is set in the request, if a content type is available.
      *
      * @param request HTTP request properties.
-     * @param entity Entity object to convert.
+     * @param httpEntity Entity object to convert.
      * @return Converted entity as an InputStream.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    InputStream write(HttpRequest request, Object entity) throws UnsupportedConversionException {
-        String characterSet = request.getCharset() ?: DEFAULT_CHARSET
-
-        Class<?> type = entity.getClass()
+    HttpEntity convertEntity(HttpEntity httpEntity) throws UnsupportedConversionException {
+        Object entity = httpEntity.getEntity()
+        Class<?> type = httpEntity.getEntity().getClass()
 
         for (EntityWriter writer : getEntityWriters()) {
             if (writer.supports(type)) {
@@ -129,14 +129,20 @@ class EntityConverterManager {
                         continue
                     }
 
-                    if (request.getContentType() == null) {
+                    HttpEntity inputStreamEntity = new HttpEntity()
+                    inputStreamEntity.setEntity(inputStream)
+
+                    if (httpEntity.getContentType()) {
+                        inputStreamEntity.setContentType(httpEntity.getFullContentType())
+                    }
+                    else {
                         String contentType = writer.getContentType()
                         if (contentType) {
                             log.trace("applying Content-Type '${contentType}' to the request")
-                            request.setContentType(contentType)
+                            inputStreamEntity.setContentType(contentType)
                         }
                     }
-                    return inputStream
+                    return inputStreamEntity
                 }
                 catch (Exception e) {
                     log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
@@ -173,6 +179,95 @@ class EntityConverterManager {
                 }
                 catch (Exception e) {
                     log.trace("error occurred during conversion with EntityReader ${reader.getClass()}", e)
+                }
+            }
+        }
+
+        throw new UnsupportedConversionException(type)
+    }
+
+    InputStream convertToInputStream(Object data) {
+        return convertToInputStream(data, 'UTF-8')
+    }
+
+    InputStream convertToInputStream(Object data, String characterSet) {
+        Class<?> type = data.getClass()
+
+        for (EntityWriter writer : getEntityWriters()) {
+            if (writer.supports(type)) {
+                try {
+                    InputStream inputStream = writer.write(data, characterSet)
+
+                    if (inputStream != null) {
+                        return inputStream
+                    }
+                }
+                catch (Exception e) {
+                    log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
+                }
+            }
+        }
+
+        throw new UnsupportedConversionException(type)
+    }
+
+    HttpEntity convertToEntity(Object data) {
+        return convertToEntity(data, 'UTF-8')
+    }
+
+    HttpEntity convertToEntity(Object data, String characterSet) {
+        Class<?> type = data.getClass()
+
+        for (EntityWriter writer : getEntityWriters()) {
+            if (writer.supports(type)) {
+                try {
+                    InputStream inputStream = writer.write(data, characterSet)
+
+                    if (inputStream == null) {
+                        continue
+                    }
+
+                    if (writer.getContentType()) {
+                        return new HttpEntity(inputStream, writer.getContentType())
+                    }
+                    else {
+                        return new HttpEntity(inputStream)
+                    }
+                }
+                catch (Exception e) {
+                    log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
+                }
+            }
+        }
+
+        throw new UnsupportedConversionException(type)
+    }
+
+    Part convertToPart(String name, Object data) {
+        return convertToPart(name, data, 'UTF-8')
+    }
+
+    Part convertToPart(String name, Object data, String characterSet) {
+        Class<?> type = data.getClass()
+
+        for (EntityWriter writer : getEntityWriters()) {
+            if (writer.supports(type)) {
+                try {
+                    InputStream inputStream = writer.write(data, characterSet)
+
+                    if (inputStream == null) {
+                        continue
+                    }
+
+                    if (writer.getContentType()) {
+                        return new Part(name, inputStream, writer.getContentType())
+                    }
+                    else {
+                        return new Part(name, inputStream)
+                    }
+                }
+                catch (Exception e) {
+                    log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
                 }
             }
         }
