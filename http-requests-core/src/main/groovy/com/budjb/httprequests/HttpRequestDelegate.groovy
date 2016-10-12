@@ -2,6 +2,9 @@ package com.budjb.httprequests
 
 import com.budjb.httprequests.core.ContentType
 import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.entity.GenericHttpEntity
+import com.budjb.httprequests.core.entity.HttpEntity
+import com.budjb.httprequests.core.entity.InputStreamHttpEntity
 
 class HttpRequestDelegate {
     /**
@@ -34,12 +37,20 @@ class HttpRequestDelegate {
         httpRequest.addHeader(name, values)
     }
 
-    void query(String name, String value) {
+    void headers(Map<String, Object> headers) {
+        httpRequest.setHeaders(headers)
+    }
+
+    void queryParameter(String name, String value) {
         httpRequest.addQueryParameter(name, value)
     }
 
-    void query(String name, List<String> values) {
+    void queryParameter(String name, List<String> values) {
         httpRequest.addQueryParameter(name, values)
+    }
+
+    void queryParameters(Map<String, Object> queryParameters) {
+        httpRequest.setQueryParameters(queryParameters)
     }
 
     void accept(String accept) {
@@ -68,5 +79,62 @@ class HttpRequestDelegate {
 
     void bufferResponseEntity(boolean bufferResponseEntity) {
         httpRequest.setBufferResponseEntity(bufferResponseEntity)
+    }
+
+    void entity(Object entity) {
+        httpRequest.setEntity(entity)
+    }
+
+    void entity(InputStream entity) {
+        httpRequest.setEntity(entity)
+    }
+
+    void entity(HttpEntity entity) {
+        httpRequest.setEntity(entity)
+    }
+
+    void entity(@DelegatesTo(HttpEntityDelegate) Closure closure) {
+        HttpEntityDelegate delegate = new HttpEntityDelegate()
+
+        closure = (Closure) closure.clone()
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = delegate
+        closure.call()
+
+        httpRequest.setEntity(delegate.build())
+    }
+
+    void multiPartEntity(Closure closure) {
+        // TODO
+    }
+
+    class HttpEntityDelegate {
+        private Object body
+        private ContentType contentType
+
+        void body(Object body) {
+            this.body = body
+        }
+
+        void contentType(String contentType) {
+            this.contentType = ContentType.parse(contentType)
+        }
+
+        HttpEntity build() {
+            HttpEntity entity
+
+            if (body instanceof InputStream) {
+                entity = InputStreamHttpEntity(body)
+            }
+            else {
+                entity = new GenericHttpEntity(body)
+            }
+
+            if (contentType) {
+                entity.setContentType(contentType)
+            }
+
+            return entity
+        }
     }
 }

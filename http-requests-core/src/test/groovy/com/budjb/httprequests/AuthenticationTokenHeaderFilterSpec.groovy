@@ -50,7 +50,7 @@ class AuthenticationTokenHeaderFilterSpec extends Specification {
         client.addFilter(filter)
 
         when:
-        client.get { uri = "http://foo.bar.com" }
+        client.get { uri "http://foo.bar.com" }
 
         then:
         client.httpContext.retries == 0
@@ -84,7 +84,7 @@ class AuthenticationTokenHeaderFilterSpec extends Specification {
         client.status = 401
 
         when:
-        def response = client.get { uri = "http://foo.bar.com" }
+        def response = client.get { uri "http://foo.bar.com" }
 
         then:
         client.httpContext.retries == 1
@@ -113,7 +113,7 @@ class AuthenticationTokenHeaderFilterSpec extends Specification {
         client.addFilter(filter)
 
         when:
-        client.get { uri = "http://foo.bar.com" }
+        client.get { uri "http://foo.bar.com" }
 
         then:
         client.httpContext.retries == 0

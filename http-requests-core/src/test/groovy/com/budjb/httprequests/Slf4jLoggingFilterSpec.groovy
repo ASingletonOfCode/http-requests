@@ -45,7 +45,7 @@ class Slf4jLoggingFilterSpec extends Specification {
         client.status = 200
 
         when:
-        def response = client.get { uri = "https://example.com" }
+        def response = client.get { uri "https://example.com" }
 
         then:
         response.status == 200
@@ -59,7 +59,7 @@ class Slf4jLoggingFilterSpec extends Specification {
         client.status = 200
 
         when:
-        def response = client.get { uri = "https://example.com" }
+        def response = client.get { uri "https://example.com" }
 
         then:
         response.status == 200
@@ -74,7 +74,7 @@ class Slf4jLoggingFilterSpec extends Specification {
         client.status = 200
 
         when:
-        def response = client.get { uri = "https://example.com" }
+        def response = client.get { uri "https://example.com" }
 
         then:
         response.status == 200
@@ -90,7 +90,7 @@ class Slf4jLoggingFilterSpec extends Specification {
         filter.setLoggerLevel(Slf4jLoggingFilter.LoggerLevel.INFO)
 
         when:
-        def response = client.get { uri = "https://example.com" }
+        def response = client.get { uri "https://example.com" }
 
         then:
         response.status == 200
@@ -107,8 +107,8 @@ class Slf4jLoggingFilterSpec extends Specification {
 
         when:
         def response = client.get {
-            uri = "https://example.com"
-            bufferResponseEntity = false
+            uri "https://example.com"
+            bufferResponseEntity false
         }
 
         then:

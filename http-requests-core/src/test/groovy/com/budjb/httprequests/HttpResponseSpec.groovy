@@ -163,7 +163,7 @@ class HttpResponseSpec extends Specification {
     def 'When the response contains an un-buffered input stream, hasEntity() returns true'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity = false },
+            HttpRequest.build { bufferResponseEntity false },
             new EntityConverterManager(),
             200,
             [:],
@@ -178,7 +178,7 @@ class HttpResponseSpec extends Specification {
     def 'When the response contains a byte array entity, hasEntity() returns true'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity = true },
+            HttpRequest.build { bufferResponseEntity true },
             new EntityConverterManager(),
             200,
             [:],

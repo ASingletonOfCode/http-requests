@@ -32,11 +32,6 @@ class HttpContext {
     HttpRequest request
 
     /**
-     * The request entity. May be null.
-     */
-    HttpEntity requestEntity
-
-    /**
      * Method of the request.
      */
     HttpMethod method

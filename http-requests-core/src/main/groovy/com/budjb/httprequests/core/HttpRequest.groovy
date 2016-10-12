@@ -15,6 +15,11 @@
  */
 package com.budjb.httprequests.core
 
+import com.budjb.httprequests.HttpRequestDelegate
+import com.budjb.httprequests.core.entity.GenericHttpEntity
+import com.budjb.httprequests.core.entity.HttpEntity
+import com.budjb.httprequests.core.entity.InputStreamHttpEntity
+
 /**
  * An object used to configure an HTTP request.
  */
@@ -66,16 +71,21 @@ class HttpRequest implements Cloneable {
     boolean bufferResponseEntity = true
 
     /**
+     * Request entity.
+     */
+    HttpEntity entity
+
+    /**
      * Construct a new {@link HttpRequest} object, configured with the given closure.
      *
      * @param closure
      * @return
      */
-    static HttpRequest build(@DelegatesTo(HttpRequest) Closure closure) {
+    static HttpRequest build(@DelegatesTo(HttpRequestDelegate) Closure closure) {
         HttpRequest request = new HttpRequest()
 
         closure = closure.clone() as Closure
-        closure.delegate = request
+        closure.delegate = new HttpRequestDelegate(request)
         closure.call()
 
         return request
@@ -494,5 +504,20 @@ class HttpRequest implements Cloneable {
         }
 
         return target
+    }
+
+    HttpRequest setEntity(HttpEntity entity) {
+        this.entity = entity
+        return this
+    }
+
+    HttpRequest setEntity(Object entity) {
+        this.entity = new GenericHttpEntity(entity)
+        return this
+    }
+
+    HttpRequest setEntity(InputStream inputStream) {
+        this.entity = new InputStreamHttpEntity(inputStream)
+        return this
     }
 }

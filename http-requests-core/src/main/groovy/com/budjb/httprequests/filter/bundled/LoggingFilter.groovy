@@ -103,13 +103,13 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
     protected void logRequestInformation(HttpContext context, StringBuilder stringBuilder) {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
-        HttpEntity requestEntity = context.getRequestEntity()
+        HttpEntity entity = request.getEntity()
 
         stringBuilder.append('Sending HTTP client request with the following data:\n')
         stringBuilder.append("> ${method.toString()} ${new URI(request.getUri()).toASCIIString()}\n")
 
-        if (requestEntity?.getContentType()) {
-            stringBuilder.append("> Content-Type: ${requestEntity.getContentType().toString()}\n")
+        if (entity?.getContentType()) {
+            stringBuilder.append("> Content-Type: ${entity.getContentType().toString()}\n")
         }
         if (request.getAccept()) {
             stringBuilder.append("> Accept: ${request.getAccept().toString()}\n")

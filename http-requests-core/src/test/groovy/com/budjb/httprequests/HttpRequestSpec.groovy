@@ -119,14 +119,14 @@ class HttpRequestSpec extends Specification {
     def 'When a request is built with the closure builder, the properties are set correctly'() {
         when:
         def request = HttpRequest.build {
-            uri = 'https://localhost:8080?going=away'
-            accept = 'application/json'
-            connectionTimeout = 10000
-            readTimeout = 5000
-            followRedirects = false
-            sslValidated = false
-            bufferResponseEntity = false
-            headers = [foo: 'bar']
+            uri 'https://localhost:8080?going=away'
+            accept 'application/json'
+            connectionTimeout 10000
+            readTimeout 5000
+            followRedirects false
+            sslValidated false
+            bufferResponseEntity false
+            headers([foo: 'bar'])
         }
 
         then:

@@ -15,13 +15,11 @@
  */
 package com.budjb.httprequests.core
 
+import com.budjb.httprequests.HttpRequestDelegate
 import com.budjb.httprequests.converter.EntityConverter
 import com.budjb.httprequests.converter.EntityConverterManager
 import com.budjb.httprequests.core.entity.ConvertingHttpEntity
-import com.budjb.httprequests.core.entity.GenericHttpEntity
 import com.budjb.httprequests.core.entity.HttpEntity
-import com.budjb.httprequests.core.entity.InputStreamHttpEntity
-import com.budjb.httprequests.exception.UnsupportedConversionException
 import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.filter.HttpClientFilterManager
 
@@ -61,66 +59,15 @@ abstract class AbstractHttpClient implements HttpClient {
      */
     @Override
     HttpResponse execute(HttpMethod method, HttpRequest request) throws IOException {
-        return run(method, request, null)
+        return run(method, request)
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    HttpResponse execute(HttpMethod method, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse execute(HttpMethod method, @DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(method, HttpRequest.build(requestClosure))
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(method, request, new InputStreamHttpEntity(inputStream))
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, InputStream inputStream,
-                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(method, HttpRequest.build(requestClosure), inputStream)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(method, request, new GenericHttpEntity(entity))
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
-        return run(method, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, Object entity,
-                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(method, HttpRequest.build(requestClosure), entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse execute(HttpMethod method, HttpEntity entity,
-                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(method, HttpRequest.build(requestClosure), entity)
     }
 
     /**
@@ -135,7 +82,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse get(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse get(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.GET, requestClosure)
     }
 
@@ -151,57 +98,8 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse post(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse post(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.POST, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse post(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.POST, request, inputStream)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse post(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.POST, inputStream, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse post(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.POST, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse post(Object entity,
-                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.POST, entity, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException {
-        return execute(HttpMethod.POST, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse post(HttpEntity entity,
-                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.POST, entity, requestClosure)
     }
 
     /**
@@ -216,58 +114,8 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse put(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse put(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.PUT, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.PUT, request, inputStream)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.PUT, inputStream, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.PUT, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(Object entity,
-                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.PUT, entity, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.PUT, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse put(HttpEntity entity,
-                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.PUT, entity, requestClosure)
     }
 
     /**
@@ -282,7 +130,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse delete(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse delete(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.DELETE, requestClosure)
     }
 
@@ -298,58 +146,8 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse options(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse options(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.OPTIONS, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(HttpRequest request, InputStream inputStream) throws IOException {
-        return execute(HttpMethod.OPTIONS, request, inputStream)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
-        return execute(HttpMethod.OPTIONS, inputStream, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.OPTIONS, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(Object entity,
-                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.OPTIONS, entity, requestClosure)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.OPTIONS, request, entity)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    HttpResponse options(HttpEntity entity,
-                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
-        return execute(HttpMethod.OPTIONS, entity, requestClosure)
     }
 
     /**
@@ -364,7 +162,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse head(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse head(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.HEAD, requestClosure)
     }
 
@@ -380,7 +178,7 @@ abstract class AbstractHttpClient implements HttpClient {
      * {@inheritDoc}
      */
     @Override
-    HttpResponse trace(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+    HttpResponse trace(@DelegatesTo(HttpRequestDelegate) Closure requestClosure) throws IOException {
         return execute(HttpMethod.TRACE, requestClosure)
     }
 
@@ -428,10 +226,11 @@ abstract class AbstractHttpClient implements HttpClient {
      * @param entity Request entity.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      */
-    protected HttpResponse run(HttpMethod method, HttpRequest request, HttpEntity entity) {
+    protected HttpResponse run(HttpMethod method, HttpRequest request) {
+        HttpEntity entity = request.getEntity()
+
         HttpContext context = new HttpContext()
         context.setMethod(method)
-        context.setRequestEntity(entity)
 
         if (entity != null) {
             // Requests whose client contains a retry filter must have their entity buffered.
