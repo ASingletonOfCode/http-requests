@@ -76,7 +76,7 @@ class JerseyHttpClient extends AbstractHttpClient {
         }
 
         if (request.getAccept()) {
-            builder = builder.accept(request.getAccept())
+            builder = builder.accept(request.getAccept().toString())
         }
 
         ClientResponse response

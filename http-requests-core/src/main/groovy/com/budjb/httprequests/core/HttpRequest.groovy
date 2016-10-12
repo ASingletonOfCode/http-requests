@@ -37,12 +37,7 @@ class HttpRequest implements Cloneable {
     /**
      * Requested content type of the response.
      */
-    String accept
-
-    /**
-     * Character set.
-     */
-    String charset
+    ContentType accept
 
     /**
      * The read timeout of the HTTP connection, in milliseconds. Defaults to 0 (infinity).
@@ -335,8 +330,19 @@ class HttpRequest implements Cloneable {
      * @param accept Requested Content-Type of the response.
      * @return The instance of this class the method was called with.
      */
-    HttpRequest setAccept(String accept) {
+    HttpRequest setAccept(ContentType accept) {
         this.accept = accept
+        return this
+    }
+
+    /**
+     * Sets the requested Content-Type of the response.
+     *
+     * @param accept Requested Content-Type of the response.
+     * @return The instance of this class the method was called with.
+     */
+    HttpRequest setAccept(String accept) {
+        this.accept = ContentType.parse(accept)
         return this
     }
 
@@ -348,17 +354,6 @@ class HttpRequest implements Cloneable {
      */
     HttpRequest setSslValidated(boolean sslValidated) {
         this.sslValidated = sslValidated
-        return this
-    }
-
-    /**
-     * Set the character set of the request.
-     *
-     * @param charSet Character set of the request.
-     * @return The instance of this class the method was called with.
-     */
-    HttpRequest setCharset(String charSet) {
-        this.charset = charSet
         return this
     }
 
@@ -463,9 +458,8 @@ class HttpRequest implements Cloneable {
         HttpRequest request = new HttpRequest()
 
         request.setUri(getUri())
-        request.setAccept(getAccept())
+        request.setAccept((ContentType)getAccept())
         request.setBufferResponseEntity(isBufferResponseEntity())
-        request.setCharset(getCharset())
         request.setConnectionTimeout(getConnectionTimeout())
         request.setReadTimeout(getReadTimeout())
         request.setFollowRedirects(isFollowRedirects())
@@ -483,7 +477,7 @@ class HttpRequest implements Cloneable {
      * @param source
      * @return
      */
-    Map<String, List<Object>> copyMultivalMap(Map<String, List<Object>> source) {
+    protected Map<String, List<Object>> copyMultivalMap(Map<String, List<Object>> source) {
         Map<String, List<Object>> target = [:]
 
         source.each { key, values ->

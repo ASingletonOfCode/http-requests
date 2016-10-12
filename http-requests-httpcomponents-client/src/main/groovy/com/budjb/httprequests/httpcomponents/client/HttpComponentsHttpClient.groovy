@@ -67,7 +67,7 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
         }
 
         if (request.getAccept()) {
-            httpRequest.setHeader('Accept', request.getAccept())
+            httpRequest.setHeader('Accept', request.getAccept().toString())
         }
 
         if (entity && httpRequest instanceof HttpEntityEnclosingRequestBase) {

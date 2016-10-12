@@ -112,7 +112,7 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
             stringBuilder.append("> Content-Type: ${requestEntity.getContentType().toString()}\n")
         }
         if (request.getAccept()) {
-            stringBuilder.append("> Accept: ${request.getAccept()}\n")
+            stringBuilder.append("> Accept: ${request.getAccept().toString()}\n")
         }
 
         request.getHeaders().each { key, values ->

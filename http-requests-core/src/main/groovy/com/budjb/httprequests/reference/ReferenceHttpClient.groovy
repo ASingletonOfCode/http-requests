@@ -64,7 +64,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
         }
 
         if (request.getAccept()) {
-            connection.setRequestProperty('Accept', request.getAccept())
+            connection.setRequestProperty('Accept', request.getAccept().toString())
         }
 
         if (context.getMethod().isSupportsResponseEntity() && entity != null) {
