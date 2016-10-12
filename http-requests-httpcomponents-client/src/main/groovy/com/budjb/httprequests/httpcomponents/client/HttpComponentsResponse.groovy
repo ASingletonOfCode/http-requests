@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.httpcomponents.client
 
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
 import org.apache.http.HttpEntity
 import org.apache.http.client.methods.CloseableHttpResponse

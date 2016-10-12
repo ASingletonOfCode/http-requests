@@ -15,12 +15,16 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.core.FormData
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.entity.GenericHttpEntity
 import com.budjb.httprequests.exception.HttpInternalServerErrorException
 import com.budjb.httprequests.filter.HttpClientRetryFilter
 import com.budjb.httprequests.filter.bundled.BasicAuthFilter
+import com.budjb.httprequests.filter.bundled.ConsoleLoggingFilter
 import com.budjb.httprequests.filter.bundled.GZIPFilter
 import com.budjb.httprequests.filter.bundled.HttpStatusExceptionFilter
-import com.budjb.httprequests.filter.bundled.Slf4jLoggingFilter
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Ignore
 import spock.lang.Unroll
@@ -48,7 +52,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     def 'When a POST request is made to /testBasicPost, the proper response is received'() {
         when:
         def response = httpClientFactory.createHttpClient().post(
-            new HttpRequest().setUri("${baseUrl}/testBasicPost").setContentType('text/plain'),
+            new HttpRequest().setUri("${baseUrl}/testBasicPost"),
             "Please don't play the repeating game!"
         )
 
@@ -59,7 +63,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     def 'When a PUT request is made to /testBasicPut, the proper response is received'() {
         when:
         def response = httpClientFactory.createHttpClient().put(
-            new HttpRequest().setUri("${baseUrl}/testBasicPut").setContentType('text/plain'),
+            new HttpRequest().setUri("${baseUrl}/testBasicPut"),
             "Please don't play the repeating game!"
         )
 
@@ -355,7 +359,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         def stream = new ByteArrayInputStream('Hello'.getBytes())
 
         when:
-        def response = httpClientFactory.createHttpClient().post(stream) { uri = "${baseUrl}/testBasicPost" }
+        def response = httpClientFactory.createHttpClient().post(stream) {
+            uri = "${baseUrl}/testBasicPost"
+        }
 
         then:
         response.getEntity(String) == 'Hello'
@@ -579,10 +585,12 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
     */
 
     def 'When a content type is already set, it will not be overwritten by a converter'() {
+        setup:
+        def entity = new GenericHttpEntity('hi!', 'foo/bar')
+
         when:
-        def response = httpClientFactory.createHttpClient().post('hi!') {
+        def response = httpClientFactory.createHttpClient().post(entity) {
             uri = "${baseUrl}/printContentType"
-            contentType = 'foo/bar'
         }
 
         then:
@@ -641,7 +649,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Ensure the LoggingFilter does not cause interruptions to HTTP requests.'() {
         when:
-        def response = httpClientFactory.createHttpClient().post("Hello, world") {
+        def response = httpClientFactory.createHttpClient().addFilter(new ConsoleLoggingFilter()).post("Hello, world") {
             uri = "${baseUrl}/testBasicPost"
         }
 
@@ -666,7 +674,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         String input = 'åäö'
 
         when:
-        def response = httpClientFactory.createHttpClient().addFilter(new Slf4jLoggingFilter()).post(input) {
+        def response = httpClientFactory.createHttpClient().post(input) {
             uri = "${baseUrl}/acceptContentType"
             accept = "text/plain;charset=${charset}"
             delegate.charset = charset

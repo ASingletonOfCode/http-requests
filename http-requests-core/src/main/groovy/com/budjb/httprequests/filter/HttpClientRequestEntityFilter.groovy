@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.filter
 
-import com.budjb.httprequests.HttpContext
+import com.budjb.httprequests.core.HttpContext
 
 /**
  * An HTTP client filter that allows modification of the request entity before it is

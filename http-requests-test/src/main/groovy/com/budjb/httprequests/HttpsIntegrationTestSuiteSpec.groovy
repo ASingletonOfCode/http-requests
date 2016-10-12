@@ -15,6 +15,8 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.core.HttpClient
+import com.budjb.httprequests.core.HttpRequest
 import spock.lang.Ignore
 
 import javax.net.ssl.SSLException

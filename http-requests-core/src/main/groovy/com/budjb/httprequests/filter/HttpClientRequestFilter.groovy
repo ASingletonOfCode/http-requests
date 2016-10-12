@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.filter
 
-import com.budjb.httprequests.HttpContext
-import com.budjb.httprequests.HttpRequest
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpRequest
 
 /**
  * An {@link HttpClientFilter} that allows modification of the {@link HttpRequest} instance before

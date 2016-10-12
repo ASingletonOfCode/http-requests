@@ -16,9 +16,11 @@
 package com.budjb.httprequests
 
 import com.budjb.httprequests.converter.EntityConverterManager
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 
 /**
- * A standalone {@link HttpResponse} implementation where its properties are injected rather
+ * A standalone {@link com.budjb.httprequests.core.HttpResponse} implementation where its properties are injected rather
  * than read from an HTTP client's response.
  */
 class MockHttpResponse extends HttpResponse {

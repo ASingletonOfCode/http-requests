@@ -1,4 +1,4 @@
-package com.budjb.httprequests.core.multipart
+package com.budjb.httprequests.core.entity.multipart
 
 class MultiPartEntityStateMachine {
     State state

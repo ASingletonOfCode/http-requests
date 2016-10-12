@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.httpcomponents.client
 
-import com.budjb.httprequests.HttpClientFactory
+import com.budjb.httprequests.core.HttpClientFactory
 import com.budjb.httprequests.HttpsIntegrationTestSuiteSpec
 
 class HttpsTestSuiteSpec extends HttpsIntegrationTestSuiteSpec {

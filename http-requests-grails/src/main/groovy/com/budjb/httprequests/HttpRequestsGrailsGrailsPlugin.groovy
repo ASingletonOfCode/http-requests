@@ -18,6 +18,7 @@ package com.budjb.httprequests
 import com.budjb.httprequests.artefact.EntityConverterArtefactHandler
 import com.budjb.httprequests.artefact.HttpClientFilterArtefactHandler
 import com.budjb.httprequests.converter.EntityConverter
+import com.budjb.httprequests.core.HttpClientFactory
 import com.budjb.httprequests.filter.HttpClientFilter
 import com.budjb.httprequests.reference.ReferenceHttpClientFactory
 import grails.plugins.Plugin
@@ -73,7 +74,7 @@ class HttpRequestsGrailsGrailsPlugin extends Plugin {
     def scm = [url: "https://github.com/budjb/http-requests"]
 
     /**
-     * Create beans for the {@link HttpClientFactory} and any {@link HttpClientFilter} or
+     * Create beans for the {@link com.budjb.httprequests.core.HttpClientFactory} and any {@link HttpClientFilter} or
      * {@link EntityConverter} artefacts.
      *
      * @return

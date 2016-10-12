@@ -15,8 +15,13 @@
  */
 package com.budjb.httprequests.httpcomponents.client
 
-import com.budjb.httprequests.*
-import org.apache.http.HttpEntity
+import com.budjb.httprequests.core.AbstractHttpClient
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpMethod
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
+import com.budjb.httprequests.core.entity.HttpEntity
+import org.apache.http.HttpEntity as ApacheHttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.*
 import org.apache.http.client.utils.URIBuilder
@@ -27,15 +32,10 @@ import org.apache.http.impl.client.HttpClients
 
 class HttpComponentsHttpClient extends AbstractHttpClient {
     /**
-     * Implements the logic to make an actual request with an HTTP client library.
-     *
-     * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
 
@@ -70,8 +70,8 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
             httpRequest.setHeader('Accept', request.getAccept())
         }
 
-        if (inputStream && httpRequest instanceof HttpEntityEnclosingRequestBase) {
-            HttpEntity entity = new InputStreamEntity(inputStream) {
+        if (entity && httpRequest instanceof HttpEntityEnclosingRequestBase) {
+            ApacheHttpEntity apacheEntity = new InputStreamEntity(entity.getInputStream()) {
                 @Override
                 public void writeTo(final OutputStream outstream) throws IOException {
                     OutputStream filtered = filterOutputStream(context, outstream)
@@ -85,8 +85,11 @@ class HttpComponentsHttpClient extends AbstractHttpClient {
                     filtered.close()
                 }
             }
-            entity.setContentType(request.getFullContentType())
-            httpRequest.setEntity(entity)
+            if (entity.getContentType()) {
+                apacheEntity.setContentType(entity.getContentType().toString())
+            }
+
+            httpRequest.setEntity(apacheEntity)
         }
 
         return new HttpComponentsResponse(request, converterManager, client.execute(httpRequest))

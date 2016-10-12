@@ -1,9 +1,9 @@
-package com.budjb.httprequests.core.multipart
+package com.budjb.httprequests.core.entity.multipart
 
 import com.budjb.httprequests.converter.EntityConverterManager
-import com.budjb.httprequests.core.HttpEntity
+import com.budjb.httprequests.core.entity.AbstractHttpEntity
 
-class MultiPartEntity extends HttpEntity {
+class MultiPartEntity extends AbstractHttpEntity {
     /**
      * Multipart boundary.
      */
@@ -13,18 +13,6 @@ class MultiPartEntity extends HttpEntity {
      * List of entities contained in this multi-part.
      */
     List<Part> parts = []
-
-    /**
-     * TODO: is this necessary? should I just move converstion into the client itself?
-     *
-     * @param converterManager
-     */
-    void convertEntities(EntityConverterManager converterManager) {
-        parts = parts.collect {
-            // TODO: fix needing to pass the request
-            converterManager.convertEntity(null, it)
-        }
-    }
 
     MultiPartEntity() {
         this("----------------------${UUID.randomUUID().toString()}")

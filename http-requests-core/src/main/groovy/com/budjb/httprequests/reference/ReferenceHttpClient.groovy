@@ -16,25 +16,24 @@
 package com.budjb.httprequests.reference
 
 import com.budjb.httprequests.*
-import com.budjb.httprequests.core.HttpEntity
+import com.budjb.httprequests.core.AbstractHttpClient
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
+import com.budjb.httprequests.core.entity.HttpEntity
 
 import javax.net.ssl.HttpsURLConnection
 
 /**
- * A built-in, basic implementation of an {@link HttpClient}. This implementation is useful
+ * A built-in, basic implementation of an {@link com.budjb.httprequests.core.HttpClient}. This implementation is useful
  * when minimal external dependencies are desired.
  */
 class ReferenceHttpClient extends AbstractHttpClient {
     /**
-     * Implements the logic to make an actual request with an HTTP client library.
-     *
-     * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, HttpEntity inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
 
         URI uri = createURI(request)
@@ -60,28 +59,28 @@ class ReferenceHttpClient extends AbstractHttpClient {
             }
         }
 
-        if (inputStream && request.getFullContentType()) {
-            connection.setRequestProperty('Content-Type', request.getFullContentType())
+        if (entity?.getContentType()) {
+            connection.setRequestProperty('Content-Type', entity.getContentType().toString())
         }
 
         if (request.getAccept()) {
             connection.setRequestProperty('Accept', request.getAccept())
         }
 
-        if (context.getMethod().isSupportsResponseEntity() && inputStream != null) {
+        if (context.getMethod().isSupportsResponseEntity() && entity != null) {
             connection.setDoInput(true)
         }
 
-        if (inputStream) {
+        if (entity) {
             if (context.getMethod().isSupportsRequestEntity()) {
                 connection.setDoOutput(true)
                 OutputStream outputStream = filterOutputStream(context, connection.getOutputStream())
-                StreamUtils.shovel(inputStream, outputStream)
-                inputStream.close()
+                StreamUtils.shovel(entity.getInputStream(), outputStream)
+                entity.close()
                 outputStream.close()
             }
             else {
-                inputStream.close()
+                entity.close()
             }
         }
 

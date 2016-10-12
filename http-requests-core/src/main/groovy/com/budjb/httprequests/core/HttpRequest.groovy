@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests
+package com.budjb.httprequests.core
 
 /**
  * An object used to configure an HTTP request.
@@ -33,11 +33,6 @@ class HttpRequest implements Cloneable {
      * Query parameters.
      */
     private final Map<String, List<String>> queryParameters = [:]
-
-    /**
-     * Content type of the request.
-     */
-    String contentType
 
     /**
      * Requested content type of the response.
@@ -335,17 +330,6 @@ class HttpRequest implements Cloneable {
     }
 
     /**
-     * Sets the Content-Type of the request.
-     *
-     * @param contentType Content-Type of the request.
-     * @return The instance of this class the method was called with.
-     */
-    HttpRequest setContentType(String contentType) {
-        this.contentType = contentType
-        return this
-    }
-
-    /**
      * Sets the requested Content-Type of the response.
      *
      * @param accept Requested Content-Type of the response.
@@ -460,27 +444,6 @@ class HttpRequest implements Cloneable {
     }
 
     /**
-     * Returns the Content-Type of the request with the character set appended to it.
-     *
-     * If the Content-Type is not set, <code>null</code> is returned.
-     *
-     * @return Content-Type of the request with the character set appended to it.
-     */
-    String getFullContentType() {
-        String contentType = this.contentType
-
-        if (!contentType) {
-            contentType = 'application/octet-stream'
-        }
-
-        if (charset) {
-            contentType += "; charset=${charset}"
-        }
-
-        return contentType
-    }
-
-    /**
      * Sets whether to automatically buffer the response entity.
      *
      * @param bufferEntity Whether to automatically buffer the response entity.
@@ -500,7 +463,6 @@ class HttpRequest implements Cloneable {
         HttpRequest request = new HttpRequest()
 
         request.setUri(getUri())
-        request.setContentType(getContentType())
         request.setAccept(getAccept())
         request.setBufferResponseEntity(isBufferResponseEntity())
         request.setCharset(getCharset())

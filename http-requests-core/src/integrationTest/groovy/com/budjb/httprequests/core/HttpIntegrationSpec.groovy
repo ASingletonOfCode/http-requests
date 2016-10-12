@@ -15,7 +15,6 @@
  */
 package com.budjb.httprequests.core
 
-import com.budjb.httprequests.HttpClientFactory
 import com.budjb.httprequests.HttpIntegrationTestSuiteSpec
 import com.budjb.httprequests.reference.ReferenceHttpClientFactory
 

@@ -15,9 +15,9 @@
  */
 package com.budjb.httprequests.filter
 
-import com.budjb.httprequests.HttpContext
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 
 /**
  * An {@link HttpClientFilter} that supports retrying HTTP requests.

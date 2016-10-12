@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.converter.bundled
 
-import com.budjb.httprequests.FormData
+import com.budjb.httprequests.core.FormData
 import com.budjb.httprequests.converter.EntityWriter
 
 /**

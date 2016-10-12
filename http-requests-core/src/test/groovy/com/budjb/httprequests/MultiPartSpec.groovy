@@ -1,11 +1,13 @@
 package com.budjb.httprequests
 
 import com.budjb.httprequests.core.ContentType
-import com.budjb.httprequests.core.multipart.MultiPartEntity
-import com.budjb.httprequests.core.multipart.Part
+import com.budjb.httprequests.core.entity.multipart.MultiPartEntity
+import com.budjb.httprequests.core.entity.multipart.Part
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class MultiPartSpec extends Specification {
+    @Ignore
     def 'does this even work?'() {
         setup:
         Part part1 = new Part('textfile', new ByteArrayInputStream("I am a text file.".getBytes()), ContentType.TEXT_PLAIN)

@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.jersey1
 
-import com.budjb.httprequests.HttpClientFactory
+import com.budjb.httprequests.core.HttpClientFactory
 import com.budjb.httprequests.HttpsIntegrationTestSuiteSpec
 
 class HttpsTestSuiteSpec extends HttpsIntegrationTestSuiteSpec {

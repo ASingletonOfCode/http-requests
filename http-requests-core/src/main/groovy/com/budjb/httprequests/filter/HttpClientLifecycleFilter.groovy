@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.filter
 
-import com.budjb.httprequests.HttpContext
+import com.budjb.httprequests.core.HttpContext
 
 trait HttpClientLifecycleFilter implements HttpClientFilter {
     void onRequest(HttpContext context, OutputStream outputStream) {

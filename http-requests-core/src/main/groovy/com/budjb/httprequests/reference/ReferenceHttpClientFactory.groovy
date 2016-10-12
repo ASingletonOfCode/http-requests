@@ -15,9 +15,9 @@
  */
 package com.budjb.httprequests.reference
 
-import com.budjb.httprequests.AbstractHttpClientFactory
-import com.budjb.httprequests.HttpClient
-import com.budjb.httprequests.HttpClientFactory
+import com.budjb.httprequests.core.AbstractHttpClientFactory
+import com.budjb.httprequests.core.HttpClient
+import com.budjb.httprequests.core.HttpClientFactory
 
 /**
  * A built-in, basic implementation of an {@link HttpClientFactory}. This implementation is useful

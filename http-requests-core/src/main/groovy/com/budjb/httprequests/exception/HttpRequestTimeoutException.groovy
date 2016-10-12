@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.exception
 
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpResponse
 
 class HttpRequestTimeoutException extends HttpStatusException {
     HttpRequestTimeoutException(HttpResponse response) {

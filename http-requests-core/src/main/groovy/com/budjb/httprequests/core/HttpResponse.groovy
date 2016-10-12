@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests
+package com.budjb.httprequests.core
 
+import com.budjb.httprequests.StreamUtils
 import com.budjb.httprequests.converter.EntityConverterManager
+import com.budjb.httprequests.core.entity.EntityInputStream
 import com.budjb.httprequests.exception.UnsupportedConversionException
 
 /**

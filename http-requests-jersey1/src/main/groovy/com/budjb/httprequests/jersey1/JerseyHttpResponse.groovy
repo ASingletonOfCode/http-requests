@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.jersey1
 
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
 import com.sun.jersey.api.client.ClientResponse
 

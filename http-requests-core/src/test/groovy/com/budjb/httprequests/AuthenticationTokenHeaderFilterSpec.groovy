@@ -17,6 +17,7 @@ package com.budjb.httprequests
 
 import com.budjb.httprequests.converter.bundled.ByteArrayEntityWriter
 import com.budjb.httprequests.converter.bundled.StringEntityWriter
+import com.budjb.httprequests.core.HttpContext
 import com.budjb.httprequests.filter.bundled.AuthenticationTokenHeaderFilter
 import spock.lang.Specification
 

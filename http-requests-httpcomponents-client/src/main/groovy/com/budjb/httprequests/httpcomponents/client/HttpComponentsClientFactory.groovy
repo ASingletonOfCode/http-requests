@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.httpcomponents.client
 
-import com.budjb.httprequests.AbstractHttpClientFactory
-import com.budjb.httprequests.HttpClient
+import com.budjb.httprequests.core.AbstractHttpClientFactory
+import com.budjb.httprequests.core.HttpClient
 
 class HttpComponentsClientFactory extends AbstractHttpClientFactory {
     /**

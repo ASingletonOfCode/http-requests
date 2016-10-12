@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.exception
 
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpResponse
 
 /**
  * An exception representing a non-2XX HTTP response. Contains both the

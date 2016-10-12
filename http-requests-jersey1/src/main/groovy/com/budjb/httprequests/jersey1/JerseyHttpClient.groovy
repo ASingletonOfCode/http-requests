@@ -15,7 +15,8 @@
  */
 package com.budjb.httprequests.jersey1
 
-import com.budjb.httprequests.*
+import com.budjb.httprequests.core.*
+import com.budjb.httprequests.core.entity.HttpEntity
 import com.sun.jersey.api.client.*
 import com.sun.jersey.api.client.config.ClientConfig
 import com.sun.jersey.api.client.config.DefaultClientConfig
@@ -24,20 +25,15 @@ import com.sun.jersey.client.urlconnection.HTTPSProperties
 import groovy.util.logging.Slf4j
 
 /**
- * An implementation of {@link HttpClient} that uses the Jersey Client 1.x library.
+ * An implementation of {@link com.budjb.httprequests.core.HttpClient} that uses the Jersey Client 1.x library.
  */
 @Slf4j
 class JerseyHttpClient extends AbstractHttpClient {
     /**
-     * Implements the logic to make an actual request with an HTTP client library.
-     *
-     * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
 
@@ -75,8 +71,8 @@ class JerseyHttpClient extends AbstractHttpClient {
             }
         }
 
-        if (inputStream && request.getFullContentType()) {
-            builder = builder.type(request.getFullContentType())
+        if (entity?.getContentType()) {
+            builder = builder.type(entity.getContentType().toString())
         }
 
         if (request.getAccept()) {
@@ -85,8 +81,8 @@ class JerseyHttpClient extends AbstractHttpClient {
 
         ClientResponse response
         try {
-            if (inputStream != null) {
-                response = builder.method(method.toString(), ClientResponse, inputStream)
+            if (entity != null) {
+                response = builder.method(method.toString(), ClientResponse, entity.getInputStream())
             }
             else {
                 response = builder.method(method.toString(), ClientResponse)

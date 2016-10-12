@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.core.FormData
 import spock.lang.Specification
 
 class FormDataSpec extends Specification {

@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests
 
+import com.budjb.httprequests.core.HttpRequest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -50,7 +51,6 @@ class HttpRequestSpec extends Specification {
         request.setUri('http://localhost')
             .setCharset('ISO-8859-8')
             .setAccept('text/plain')
-            .setContentType('application/json')
             .addHeader('foo', 'bar')
             .addHeader('foo', ['1', '2'])
             .addHeaders([hi: ['there']])
@@ -65,7 +65,6 @@ class HttpRequestSpec extends Specification {
         then:
         request.getCharset() == 'ISO-8859-8'
         request.getAccept() == 'text/plain'
-        request.getContentType() == 'application/json'
         request.getHeaders() == [foo: ['bar', '1', '2'], hi: ['there']]
         request.getQueryParameters() == [foo: ['bar', '1', '2'], hi: ['there']]
         !request.isSslValidated()
@@ -124,7 +123,6 @@ class HttpRequestSpec extends Specification {
         def request = HttpRequest.build {
             uri = 'https://localhost:8080?going=away'
             accept = 'application/json'
-            contentType = 'text/plain'
             connectionTimeout = 10000
             readTimeout = 5000
             followRedirects = false
@@ -137,7 +135,6 @@ class HttpRequestSpec extends Specification {
         then:
         request.uri == 'https://localhost:8080'
         request.accept == 'application/json'
-        request.contentType == 'text/plain'
         request.connectionTimeout == 10000
         request.readTimeout == 5000
         !request.followRedirects

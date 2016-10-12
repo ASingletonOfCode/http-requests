@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests
+package com.budjb.httprequests.core
 
 /**
  * A holder class that is useful to contain an instance of {@link HttpClientFactory} and make it available to the rest

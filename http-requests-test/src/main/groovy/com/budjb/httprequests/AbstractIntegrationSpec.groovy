@@ -16,6 +16,7 @@
 package com.budjb.httprequests
 
 import com.budjb.httprequests.application.TestApp
+import com.budjb.httprequests.core.HttpClientFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.boot.test.WebIntegrationTest

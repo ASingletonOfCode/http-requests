@@ -19,6 +19,9 @@ import com.budjb.httprequests.converter.EntityConverterManager
 import com.budjb.httprequests.converter.EntityConverter
 import com.budjb.httprequests.converter.bundled.StringEntityReader
 import com.budjb.httprequests.converter.bundled.StringEntityWriter
+import com.budjb.httprequests.core.HttpClient
+import com.budjb.httprequests.core.entity.GenericHttpEntity
+import com.budjb.httprequests.core.entity.HttpEntity
 import com.budjb.httprequests.exception.UnsupportedConversionException
 import spock.lang.Specification
 
@@ -56,9 +59,10 @@ class ConverterSpec extends Specification {
     def 'When no writer is available to perform conversion, an UnsupportedConversionException is thrown'() {
         setup:
         EntityConverterManager converterManager = new EntityConverterManager()
+        HttpEntity entity = new GenericHttpEntity('Hello!')
 
         when:
-        converterManager.convertEntity(new HttpRequest(), 'Hello!')
+        converterManager.convertHttpEntity(entity, entity.getObject())
 
         then:
         thrown UnsupportedConversionException

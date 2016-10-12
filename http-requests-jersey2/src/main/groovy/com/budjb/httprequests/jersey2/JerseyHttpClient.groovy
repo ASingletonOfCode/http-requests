@@ -15,7 +15,12 @@
  */
 package com.budjb.httprequests.jersey2
 
-import com.budjb.httprequests.*
+import com.budjb.httprequests.core.AbstractHttpClient
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpMethod
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
+import com.budjb.httprequests.core.entity.HttpEntity
 import org.glassfish.jersey.client.ClientConfig
 import org.glassfish.jersey.client.ClientProperties
 
@@ -28,15 +33,10 @@ import javax.ws.rs.ext.WriterInterceptorContext
 
 class JerseyHttpClient extends AbstractHttpClient {
     /**
-     * Implements the logic to make an actual request with an HTTP client library.
-     *
-     * @param context HTTP request context.
-     * @param inputStream An {@link InputStream} containing the response body. May be <code>null</code>.
-     * @return A {@link HttpResponse} object containing the properties of the server response.
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, InputStream inputStream) throws IOException {
+    protected HttpResponse doExecute(HttpContext context, HttpEntity httpEntity) throws IOException {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
 
@@ -80,8 +80,8 @@ class JerseyHttpClient extends AbstractHttpClient {
         }
 
         Entity<InputStream> entity = null
-        if (inputStream) {
-            entity = Entity.entity(inputStream, request.getFullContentType())
+        if (httpEntity) {
+            entity = Entity.entity(httpEntity.getInputStream(), httpEntity.getContentType()?.toString())
         }
 
         Response clientResponse

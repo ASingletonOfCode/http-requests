@@ -1,9 +1,9 @@
-package com.budjb.httprequests.core.multipart
+package com.budjb.httprequests.core.entity.multipart
 
-import com.budjb.httprequests.core.HttpEntity
-import com.budjb.httprequests.core.multipart.MultiPartEntityStateMachine.Event
-import com.budjb.httprequests.core.multipart.MultiPartEntityStateMachine.RepeatEvaluationException
-import com.budjb.httprequests.core.multipart.MultiPartEntityStateMachine.State
+import com.budjb.httprequests.core.entity.AbstractHttpEntity
+import com.budjb.httprequests.core.entity.multipart.MultiPartEntityStateMachine.Event
+import com.budjb.httprequests.core.entity.multipart.MultiPartEntityStateMachine.RepeatEvaluationException
+import com.budjb.httprequests.core.entity.multipart.MultiPartEntityStateMachine.State
 
 class MultiPartEntityInputStream extends InputStream {
     MultiPartEntity multiPartEntity
@@ -172,7 +172,7 @@ class MultiPartEntityInputStream extends InputStream {
     }
 
     /**
-     * Determines if there are additional {@link HttpEntity} objects to process
+     * Determines if there are additional {@link AbstractHttpEntity} objects to process
      * once the previous one has been completed.
      *
      * @return

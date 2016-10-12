@@ -1,18 +1,20 @@
-package com.budjb.httprequests.core
+package com.budjb.httprequests.core.entity
 
-class ObjectHttpEntity extends HttpEntity {
+import com.budjb.httprequests.core.ContentType
+
+class GenericHttpEntity extends ConvertingHttpEntity {
     /**
      * Object representing the entity.
      */
-    final Object object
+    Object object
 
     /**
      * Constructs the entity with the given object and Content-Type of application/octet-stream.
      *
      * @param object
      */
-    ObjectHttpEntity(Object object) {
-        this(object, ContentType.APPLICATION_OCTET_STREAM)
+    GenericHttpEntity(Object object) {
+        setObject(object)
     }
 
     /**
@@ -21,8 +23,9 @@ class ObjectHttpEntity extends HttpEntity {
      * @param object
      * @param contentType
      */
-    ObjectHttpEntity(Object object, String contentType) {
-        this(object, ContentType.parse(contentType))
+    GenericHttpEntity(Object object, String contentType) {
+        setObject(object)
+        setContentType(contentType)
     }
 
     /**
@@ -31,8 +34,8 @@ class ObjectHttpEntity extends HttpEntity {
      * @param object
      * @param contentType
      */
-    ObjectHttpEntity(Object object, ContentType contentType) {
-        super(contentType)
-        this.object = object
+    GenericHttpEntity(Object object, ContentType contentType) {
+        setObject(object)
+        setContentType(contentType)
     }
 }

@@ -1,0 +1,566 @@
+/*
+ * Copyright 2016 Bud Byrd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.budjb.httprequests.core
+
+import com.budjb.httprequests.converter.EntityConverter
+import com.budjb.httprequests.converter.EntityConverterManager
+import com.budjb.httprequests.core.entity.ConvertingHttpEntity
+import com.budjb.httprequests.core.entity.GenericHttpEntity
+import com.budjb.httprequests.core.entity.HttpEntity
+import com.budjb.httprequests.core.entity.InputStreamHttpEntity
+import com.budjb.httprequests.exception.UnsupportedConversionException
+import com.budjb.httprequests.filter.HttpClientFilter
+import com.budjb.httprequests.filter.HttpClientFilterManager
+
+import javax.net.ssl.*
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+
+/**
+ * A base class for HTTP clients that implements most of the functionality of the {@link HttpClient} interface.
+ *
+ * Individual HTTP client library implementations should extend this class.
+ */
+abstract class AbstractHttpClient implements HttpClient {
+    /**
+     * Converter manager.
+     */
+    EntityConverterManager converterManager
+
+    /**
+     * Filter manager.
+     */
+    HttpClientFilterManager filterManager
+
+    /**
+     * Implements the logic to make an actual request with an HTTP client library.
+     *
+     * @param context HTTP request context.
+     * @param entity An {@link HttpEntity} containing the request body. May be <code>null</code>.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     * @throws IOException
+     */
+    protected
+    abstract HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpRequest request) throws IOException {
+        return run(method, request, null)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(method, HttpRequest.build(requestClosure))
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpRequest request, InputStream inputStream) throws IOException {
+        return execute(method, request, new InputStreamHttpEntity(inputStream))
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, InputStream inputStream,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(method, HttpRequest.build(requestClosure), inputStream)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
+        return execute(method, request, new GenericHttpEntity(entity))
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return run(method, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, Object entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(method, HttpRequest.build(requestClosure), entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse execute(HttpMethod method, HttpEntity entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(method, HttpRequest.build(requestClosure), entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse get(HttpRequest request) throws IOException {
+        return execute(HttpMethod.GET, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse get(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.GET, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(HttpRequest request) throws IOException {
+        return execute(HttpMethod.POST, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.POST, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(HttpRequest request, InputStream inputStream) throws IOException {
+        return execute(HttpMethod.POST, request, inputStream)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.POST, inputStream, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.POST, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(Object entity,
+                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.POST, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    HttpResponse post(HttpRequest request, HttpEntity entity) throws IOException {
+        return execute(HttpMethod.POST, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse post(HttpEntity entity,
+                      @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.POST, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(HttpRequest request) throws IOException {
+        return execute(HttpMethod.PUT, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.PUT, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(HttpRequest request, InputStream inputStream) throws IOException {
+        return execute(HttpMethod.PUT, request, inputStream)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.PUT, inputStream, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(Object entity,
+                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse put(HttpEntity entity,
+                     @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.PUT, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse delete(HttpRequest request) throws IOException {
+        return execute(HttpMethod.DELETE, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse delete(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.DELETE, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(HttpRequest request) throws IOException {
+        return execute(HttpMethod.OPTIONS, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.OPTIONS, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(HttpRequest request, InputStream inputStream) throws IOException {
+        return execute(HttpMethod.OPTIONS, request, inputStream)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(InputStream inputStream, @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.OPTIONS, inputStream, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(HttpRequest request, Object entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(Object entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(HttpRequest request, HttpEntity entity) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, request, entity)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse options(HttpEntity entity,
+                         @DelegatesTo(HttpRequest) Closure requestClosure) throws IOException, UnsupportedConversionException {
+        return execute(HttpMethod.OPTIONS, entity, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse head(HttpRequest request) throws IOException {
+        return execute(HttpMethod.HEAD, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse head(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.HEAD, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse trace(HttpRequest request) throws IOException {
+        return execute(HttpMethod.TRACE, request)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpResponse trace(@DelegatesTo(HttpRequest) Closure requestClosure) throws IOException {
+        return execute(HttpMethod.TRACE, requestClosure)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpClient addFilter(HttpClientFilter filter) {
+        filterManager.add(filter)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpClient removeFilter(HttpClientFilter filter) {
+        filterManager.remove(filter)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    List<HttpClientFilter> getFilters() {
+        return filterManager.getAll()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HttpClient clearFilters() {
+        filterManager.clear()
+        return this
+    }
+
+    /**
+     * Orchestrates making the HTTP request. Fires appropriate filter events and hands off to the implementation
+     * to perform the actual HTTP request.
+     *
+     * @param method HTTP request method.
+     * @param request {@link HttpRequest} object to configure the request.
+     * @param entity Request entity.
+     * @return A {@link HttpResponse} object containing the properties of the server response.
+     */
+    protected HttpResponse run(HttpMethod method, HttpRequest request, HttpEntity entity) {
+        HttpContext context = new HttpContext()
+        context.setMethod(method)
+        context.setRequestEntity(entity)
+
+        if (entity != null) {
+            // Requests whose client contains a retry filter must have their entity buffered.
+            // If it is not, the retried request will either throw an error due to the entity
+            // input stream being closed, or the entity will not actually transmit. So, requests
+            // that could potentially be retried are automatically read into a ByteArrayInputStream
+            // so that it can be transmitted more than once.
+            if (filterManager.hasRetryFilters()) {
+                entity.setBuffered(true)
+            }
+
+            if (entity instanceof ConvertingHttpEntity) {
+                entity.convert(getConverterManager())
+            }
+        }
+
+        while (true) {
+            if (entity != null) {
+                entity.reset()
+            }
+
+            HttpRequest newRequest = request.clone() as HttpRequest
+            context.setRequest(newRequest)
+            context.setResponse(null)
+
+            filterManager.filterHttpRequest(context)
+
+            // Requests that do not include an entity should still have their
+            // {@link HttpClientLifecycleFilter#onRequest} method called. If the request does
+            // contain an entity, it is the responsibility of the implementation to make a call
+            // to {@link #filterOutputStream}.
+            if (!entity) {
+                filterManager.onRequest(context, null)
+            }
+
+            // Note that {@link HttpClientRequestEntityFilter#filterRequestEntity} and
+            // {@link HttpClientLifecycleFilter#onRequest} should be initiated from the
+            // client implementation, and will occur during the execution started below.
+            HttpResponse response = doExecute(context, entity)
+
+            context.setResponse(response)
+
+            filterManager.filterHttpResponse(context)
+
+            filterManager.onResponse(context)
+
+            if (!filterManager.onRetry(context)) {
+                filterManager.onComplete(context)
+                return response
+            }
+
+            context.incrementRetries()
+        }
+    }
+
+    /**
+     * Filter the output stream.
+     *
+     * @param context HTTP request context.
+     * @param outputStream Output stream of the request.
+     */
+    OutputStream filterOutputStream(HttpContext context, OutputStream outputStream) {
+        outputStream = filterManager.filterRequestEntity(context, outputStream)
+
+        filterManager.onRequest(context, outputStream)
+
+        return outputStream
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void addEntityConverter(EntityConverter converter) {
+        converterManager.add(converter)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    List<EntityConverter> getEntityConverters() {
+        return converterManager.getAll()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void removeEntityConverter(EntityConverter converter) {
+        converterManager.remove(converter)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void clearEntityConverters() {
+        converterManager.clear()
+    }
+
+    /**
+     * Create and return an all-trusting TLS {@link SSLContext}.
+     *
+     * @return An all-trusting TLS {@link SSLContext}.
+     */
+    protected SSLContext createTrustingSSLContext() {
+        TrustManager[] certs = [new X509TrustManager() {
+            X509Certificate[] getAcceptedIssuers() {
+                null
+            }
+
+            void checkClientTrusted(X509Certificate[] certs, String authType) {}
+
+            void checkServerTrusted(X509Certificate[] certs, String authType) {}
+        }]
+
+        SSLContext sslContext = SSLContext.getInstance('TLS')
+        sslContext.init(null, certs, new SecureRandom())
+
+        return sslContext
+    }
+
+    /**
+     * Create and return an all-trusting {@link HostnameVerifier}.
+     *
+     * @return An all-trusting {@link HostnameVerifier}.
+     */
+    protected HostnameVerifier createTrustingHostnameVerifier() {
+        return new HostnameVerifier() {
+            boolean verify(String hostname, SSLSession session) {
+                return true
+            }
+        }
+    }
+}

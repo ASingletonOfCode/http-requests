@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests
+package com.budjb.httprequests.core
+
+import com.budjb.httprequests.core.entity.HttpEntity
 
 /**
  * A context for HTTP requests that can be used by filters.
@@ -25,9 +27,14 @@ class HttpContext {
     private final Map<String, Object> data = [:]
 
     /**
-     * The request configuration
+     * The request configuration.
      */
     HttpRequest request
+
+    /**
+     * The request entity. May be null.
+     */
+    HttpEntity requestEntity
 
     /**
      * Method of the request.

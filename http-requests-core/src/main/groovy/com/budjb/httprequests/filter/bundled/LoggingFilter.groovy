@@ -15,10 +15,11 @@
  */
 package com.budjb.httprequests.filter.bundled
 
-import com.budjb.httprequests.HttpContext
-import com.budjb.httprequests.HttpMethod
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpContext
+import com.budjb.httprequests.core.HttpMethod
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
+import com.budjb.httprequests.core.entity.HttpEntity
 import com.budjb.httprequests.filter.HttpClientLifecycleFilter
 import com.budjb.httprequests.filter.HttpClientRequestEntityFilter
 import com.budjb.httprequests.filter.HttpClientResponseEntityFilter
@@ -102,12 +103,13 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
     protected void logRequestInformation(HttpContext context, StringBuilder stringBuilder) {
         HttpRequest request = context.getRequest()
         HttpMethod method = context.getMethod()
+        HttpEntity requestEntity = context.getRequestEntity()
 
         stringBuilder.append('Sending HTTP client request with the following data:\n')
         stringBuilder.append("> ${method.toString()} ${new URI(request.getUri()).toASCIIString()}\n")
 
-        if (request.getContentType()) {
-            stringBuilder.append("> Content-Type: ${request.getFullContentType()}\n")
+        if (requestEntity?.getContentType()) {
+            stringBuilder.append("> Content-Type: ${requestEntity.getContentType().toString()}\n")
         }
         if (request.getAccept()) {
             stringBuilder.append("> Accept: ${request.getAccept()}\n")

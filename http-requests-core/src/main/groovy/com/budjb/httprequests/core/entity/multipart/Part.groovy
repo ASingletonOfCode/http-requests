@@ -1,4 +1,4 @@
-package com.budjb.httprequests.core.multipart
+package com.budjb.httprequests.core.entity.multipart
 
 import com.budjb.httprequests.core.ContentType
 

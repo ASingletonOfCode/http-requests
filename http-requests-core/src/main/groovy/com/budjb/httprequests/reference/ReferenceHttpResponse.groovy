@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.reference
 
-import com.budjb.httprequests.HttpRequest
-import com.budjb.httprequests.HttpResponse
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 import com.budjb.httprequests.converter.EntityConverterManager
 
 /**

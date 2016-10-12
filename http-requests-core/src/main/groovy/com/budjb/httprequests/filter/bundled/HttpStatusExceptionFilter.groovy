@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.filter.bundled
 
-import com.budjb.httprequests.HttpContext
+import com.budjb.httprequests.core.HttpContext
 import com.budjb.httprequests.exception.HttpStatusException
 import com.budjb.httprequests.filter.HttpClientLifecycleFilter
 

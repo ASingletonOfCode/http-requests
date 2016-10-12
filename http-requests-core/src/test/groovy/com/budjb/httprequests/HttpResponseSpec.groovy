@@ -17,6 +17,9 @@ package com.budjb.httprequests
 
 import com.budjb.httprequests.converter.EntityConverterManager
 import com.budjb.httprequests.converter.bundled.StringEntityReader
+import com.budjb.httprequests.core.HttpMethod
+import com.budjb.httprequests.core.HttpRequest
+import com.budjb.httprequests.core.HttpResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
