@@ -20,11 +20,12 @@ import com.budjb.httprequests.v2.core.HttpContext
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.exception.HttpInternalServerErrorException
-import com.budjb.httprequests.v2.filter.HttpClientRetryFilter
-import com.budjb.httprequests.v2.filter.bundled.BasicAuthFilter
-import com.budjb.httprequests.v2.filter.bundled.ConsoleLoggingFilter
-import com.budjb.httprequests.v2.filter.bundled.GZIPFilter
-import com.budjb.httprequests.v2.filter.bundled.HttpStatusExceptionFilter
+import com.budjb.httprequests.v2.core.filter.HttpClientRetryFilter
+import com.budjb.httprequests.v2.core.filter.bundled.BasicAuthFilter
+import com.budjb.httprequests.v2.core.filter.bundled.ConsoleLoggingFilter
+import com.budjb.httprequests.v2.core.filter.bundled.GZIPFilter
+import com.budjb.httprequests.v2.core.filter.bundled.HttpStatusExceptionFilter
+import com.budjb.httprequests.v2.util.StreamUtils
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Ignore
 import spock.lang.Unroll

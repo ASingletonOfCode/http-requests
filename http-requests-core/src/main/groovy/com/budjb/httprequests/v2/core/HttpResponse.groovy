@@ -15,10 +15,10 @@
  */
 package com.budjb.httprequests.v2.core
 
-import com.budjb.httprequests.v2.StreamUtils
-import com.budjb.httprequests.v2.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.entity.EntityInputStream
 import com.budjb.httprequests.v2.exception.UnsupportedConversionException
+import com.budjb.httprequests.v2.util.StreamUtils
 
 /**
  * An object that represents the response of an HTTP request.

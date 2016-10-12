@@ -1,6 +1,6 @@
 package com.budjb.httprequests.v2.core.entity
 
-import com.budjb.httprequests.v2.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
 abstract class ConvertingHttpEntity extends AbstractHttpEntity {
     /**

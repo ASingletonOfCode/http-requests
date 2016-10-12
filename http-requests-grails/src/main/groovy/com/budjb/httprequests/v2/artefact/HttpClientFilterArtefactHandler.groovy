@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.v2.artefact
 
-import com.budjb.httprequests.v2.filter.HttpClientFilter
+import com.budjb.httprequests.v2.core.filter.HttpClientFilter
 import grails.core.ArtefactHandlerAdapter
 
 class HttpClientFilterArtefactHandler extends ArtefactHandlerAdapter {

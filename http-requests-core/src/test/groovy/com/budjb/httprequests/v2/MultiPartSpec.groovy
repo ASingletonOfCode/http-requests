@@ -3,6 +3,7 @@ package com.budjb.httprequests.v2
 import com.budjb.httprequests.v2.core.ContentType
 import com.budjb.httprequests.v2.core.entity.multipart.MultiPartEntity
 import com.budjb.httprequests.v2.core.entity.multipart.Part
+import com.budjb.httprequests.v2.util.StreamUtils
 import spock.lang.Ignore
 import spock.lang.Specification
 

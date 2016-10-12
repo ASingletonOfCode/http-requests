@@ -15,12 +15,12 @@
  */
 package com.budjb.httprequests.v2.reference
 
-import com.budjb.httprequests.v2.StreamUtils
 import com.budjb.httprequests.v2.core.AbstractHttpClient
 import com.budjb.httprequests.v2.core.HttpContext
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.entity.HttpEntity
+import com.budjb.httprequests.v2.util.StreamUtils
 
 import javax.net.ssl.HttpsURLConnection
 

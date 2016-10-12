@@ -15,10 +15,10 @@
  */
 package com.budjb.httprequests.v2.core
 
-import com.budjb.httprequests.v2.converter.EntityConverter
-import com.budjb.httprequests.v2.converter.EntityConverterManager
-import com.budjb.httprequests.v2.filter.HttpClientFilter
-import com.budjb.httprequests.v2.filter.HttpClientFilterManager
+import com.budjb.httprequests.v2.core.converter.EntityConverter
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.filter.HttpClientFilter
+import com.budjb.httprequests.v2.core.filter.HttpClientFilterManager
 
 /**
  * An interface that describes the common structure and methods of an HTTP client.

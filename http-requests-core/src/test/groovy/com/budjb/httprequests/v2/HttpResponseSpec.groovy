@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.EntityConverterManager
-import com.budjb.httprequests.v2.converter.bundled.StringEntityReader
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import com.budjb.httprequests.v2.core.HttpMethod
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse

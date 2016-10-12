@@ -15,10 +15,10 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.EntityConverter
-import com.budjb.httprequests.v2.converter.EntityConverterManager
-import com.budjb.httprequests.v2.converter.bundled.StringEntityReader
-import com.budjb.httprequests.v2.converter.bundled.StringEntityWriter
+import com.budjb.httprequests.v2.core.converter.EntityConverter
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
 import com.budjb.httprequests.v2.core.HttpClient
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.core.entity.HttpEntity

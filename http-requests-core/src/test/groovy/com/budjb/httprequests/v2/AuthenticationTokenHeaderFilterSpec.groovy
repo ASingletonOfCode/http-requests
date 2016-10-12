@@ -15,10 +15,10 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.bundled.ByteArrayEntityWriter
-import com.budjb.httprequests.v2.converter.bundled.StringEntityWriter
+import com.budjb.httprequests.v2.core.converter.bundled.ByteArrayEntityWriter
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
 import com.budjb.httprequests.v2.core.HttpContext
-import com.budjb.httprequests.v2.filter.bundled.AuthenticationTokenHeaderFilter
+import com.budjb.httprequests.v2.core.filter.bundled.AuthenticationTokenHeaderFilter
 import spock.lang.Specification
 
 class AuthenticationTokenHeaderFilterSpec extends Specification {

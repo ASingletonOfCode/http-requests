@@ -15,9 +15,9 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.bundled.StringEntityReader
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import com.budjb.httprequests.v2.core.entity.EntityInputStream
-import com.budjb.httprequests.v2.filter.bundled.Slf4jLoggingFilter
+import com.budjb.httprequests.v2.core.filter.bundled.Slf4jLoggingFilter
 import org.slf4j.Logger
 import spock.lang.Specification
 

@@ -1,7 +1,7 @@
 package com.budjb.httprequests.v2.core.entity
 
-import com.budjb.httprequests.v2.StreamUtils
 import com.budjb.httprequests.v2.core.ContentType
+import com.budjb.httprequests.v2.util.StreamUtils
 
 /**
  * Base implementation of an {@link HttpEntity}.

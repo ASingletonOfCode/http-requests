@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.v2.artefact
 
-import com.budjb.httprequests.v2.converter.EntityConverter
+import com.budjb.httprequests.v2.core.converter.EntityConverter
 import grails.core.ArtefactHandlerAdapter
 
 class EntityConverterArtefactHandler extends ArtefactHandlerAdapter {

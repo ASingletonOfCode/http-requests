@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.v2.core
 
-import com.budjb.httprequests.v2.converter.EntityConverter
-import com.budjb.httprequests.v2.filter.HttpClientFilter
+import com.budjb.httprequests.v2.core.converter.EntityConverter
+import com.budjb.httprequests.v2.core.filter.HttpClientFilter
 
 /**
  * Describes a factory class that creates an {@link HttpClient} instance. Individual HTTP client libraries

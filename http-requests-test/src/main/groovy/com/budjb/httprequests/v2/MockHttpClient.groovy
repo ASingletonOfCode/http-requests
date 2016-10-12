@@ -15,13 +15,13 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.AbstractHttpClient
 import com.budjb.httprequests.v2.core.HttpClient
 import com.budjb.httprequests.v2.core.HttpContext
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.entity.HttpEntity
-import com.budjb.httprequests.v2.filter.HttpClientFilterManager
+import com.budjb.httprequests.v2.core.filter.HttpClientFilterManager
 
 /**
  * An implementation of {@link HttpClient} that does not make an actual HTTP request; rather it allows

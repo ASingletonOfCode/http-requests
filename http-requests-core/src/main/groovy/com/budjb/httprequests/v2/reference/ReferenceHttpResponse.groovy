@@ -15,9 +15,9 @@
  */
 package com.budjb.httprequests.v2.reference
 
-import com.budjb.httprequests.v2.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
 /**
  * An {@link HttpResponse} implementation that wraps an {@link HttpURLConnection} object.

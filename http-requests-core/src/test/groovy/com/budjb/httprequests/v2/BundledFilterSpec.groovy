@@ -15,11 +15,11 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.converter.bundled.ByteArrayEntityWriter
-import com.budjb.httprequests.v2.converter.bundled.StringEntityWriter
-import com.budjb.httprequests.v2.filter.bundled.BasicAuthFilter
-import com.budjb.httprequests.v2.filter.bundled.DeflateFilter
-import com.budjb.httprequests.v2.filter.bundled.GZIPFilter
+import com.budjb.httprequests.v2.core.converter.bundled.ByteArrayEntityWriter
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
+import com.budjb.httprequests.v2.core.filter.bundled.BasicAuthFilter
+import com.budjb.httprequests.v2.core.filter.bundled.DeflateFilter
+import com.budjb.httprequests.v2.core.filter.bundled.GZIPFilter
 import spock.lang.Specification
 
 class BundledFilterSpec extends Specification {

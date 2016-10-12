@@ -17,9 +17,9 @@ package com.budjb.httprequests.v2
 
 import com.budjb.httprequests.v2.artefact.EntityConverterArtefactHandler
 import com.budjb.httprequests.v2.artefact.HttpClientFilterArtefactHandler
-import com.budjb.httprequests.v2.converter.EntityConverter
+import com.budjb.httprequests.v2.core.converter.EntityConverter
 import com.budjb.httprequests.v2.core.HttpClientFactory
-import com.budjb.httprequests.v2.filter.HttpClientFilter
+import com.budjb.httprequests.v2.core.filter.HttpClientFilter
 import com.budjb.httprequests.v2.reference.ReferenceHttpClientFactory
 import grails.plugins.Plugin
 import groovy.util.logging.Slf4j
