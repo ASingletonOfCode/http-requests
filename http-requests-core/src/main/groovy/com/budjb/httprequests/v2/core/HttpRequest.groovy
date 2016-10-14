@@ -351,7 +351,7 @@ class HttpRequest implements Cloneable {
      * @return The instance of this class the method was called with.
      */
     HttpRequest setAccept(String accept) {
-        this.accept = ContentType.parse(accept)
+        this.accept = new ContentType(accept)
         return this
     }
 
@@ -473,6 +473,7 @@ class HttpRequest implements Cloneable {
         request.setReadTimeout(getReadTimeout())
         request.setFollowRedirects(isFollowRedirects())
         request.setSslValidated(isSslValidated())
+        request.setEntity(getEntity())
 
         request.setHeaders(copyMultivalMap(getHeaders()))
         request.setQueryParameters(copyMultivalMap(getQueryParameters()))
@@ -511,7 +512,12 @@ class HttpRequest implements Cloneable {
     }
 
     HttpRequest setEntity(Object entity) {
-        this.entity = new GenericHttpEntity(entity)
+        if (entity == null) {
+            this.entity = null
+        }
+        else {
+            this.entity = new GenericHttpEntity(entity)
+        }
         return this
     }
 

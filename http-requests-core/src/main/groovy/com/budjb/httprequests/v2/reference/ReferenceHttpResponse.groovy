@@ -40,7 +40,7 @@ class ReferenceHttpResponse extends HttpResponse {
         this.httpURLConnection = connection
 
         setStatus(connection.getResponseCode())
-        setContentType(connection.getContentType())
+        setContentType((String)connection.getContentType())
         setHeaders(connection.getHeaderFields())
 
         if (connection.getDoInput()) {

@@ -16,6 +16,6 @@ abstract class ConvertingHttpEntity extends AbstractHttpEntity {
      * @param converterManager
      */
     void convert(EntityConverterManager converterManager) {
-        inputStream = converterManager.convertHttpEntity(this, getObject())
+        setInputStream(converterManager.write(this))
     }
 }

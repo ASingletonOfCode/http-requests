@@ -26,14 +26,6 @@ interface EntityWriter extends EntityConverter {
     String getContentType()
 
     /**
-     * Determines whether the given class type is supported by the writer.
-     *
-     * @param type Type to convert.
-     * @return Whether the type is supported.
-     */
-    boolean supports(Class<?> type)
-
-    /**
      * Convert the given entity.
      *
      * If an error occurs, null may be returned so that another converter may attempt conversion.

@@ -45,13 +45,14 @@ abstract class AbstractHttpClient implements HttpClient {
     /**
      * Implements the logic to make an actual request with an HTTP client library.
      *
+     * // TODO: revisit this and remove the entity
+     *
      * @param context HTTP request context.
-     * @param entity An {@link HttpEntity} containing the request body. May be <code>null</code>.
      * @return A {@link HttpResponse} object containing the properties of the server response.
      * @throws IOException
      */
     protected
-    abstract HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException
+    abstract HttpResponse doExecute(HttpContext context) throws IOException
 
     /**
      * {@inheritDoc}
@@ -218,6 +219,34 @@ abstract class AbstractHttpClient implements HttpClient {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    void addEntityConverter(EntityConverter converter) {
+        converterManager.add(converter)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    List<EntityConverter> getEntityConverters() {
+        return converterManager.getAll()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void removeEntityConverter(EntityConverter converter) {
+        converterManager.remove(converter)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void clearEntityConverters() {
+        converterManager.clear()
+    }
+
+    /**
      * Orchestrates making the HTTP request. Fires appropriate filter events and hands off to the implementation
      * to perform the actual HTTP request.
      *
@@ -269,7 +298,7 @@ abstract class AbstractHttpClient implements HttpClient {
             // Note that {@link HttpClientRequestEntityFilter#filterRequestEntity} and
             // {@link HttpClientLifecycleFilter#onRequest} should be initiated from the
             // client implementation, and will occur during the execution started below.
-            HttpResponse response = doExecute(context, entity)
+            HttpResponse response = doExecute(context)
 
             context.setResponse(response)
 
@@ -292,40 +321,12 @@ abstract class AbstractHttpClient implements HttpClient {
      * @param context HTTP request context.
      * @param outputStream Output stream of the request.
      */
-    OutputStream filterOutputStream(HttpContext context, OutputStream outputStream) {
+    protected OutputStream filterOutputStream(HttpContext context, OutputStream outputStream) {
         outputStream = filterManager.filterRequestEntity(context, outputStream)
 
         filterManager.onRequest(context, outputStream)
 
         return outputStream
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    void addEntityConverter(EntityConverter converter) {
-        converterManager.add(converter)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    List<EntityConverter> getEntityConverters() {
-        return converterManager.getAll()
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    void removeEntityConverter(EntityConverter converter) {
-        converterManager.remove(converter)
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    void clearEntityConverters() {
-        converterManager.clear()
     }
 
     /**

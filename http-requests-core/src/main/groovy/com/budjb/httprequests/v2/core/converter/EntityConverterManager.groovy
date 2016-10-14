@@ -15,18 +15,14 @@
  */
 package com.budjb.httprequests.v2.core.converter
 
+import com.budjb.httprequests.v2.core.ContentType
+import com.budjb.httprequests.v2.core.entity.ConvertingHttpEntity
 import com.budjb.httprequests.v2.core.entity.EntityInputStream
-import com.budjb.httprequests.v2.core.entity.HttpEntity
-import com.budjb.httprequests.v2.exception.UnsupportedConversionException
+import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
 
 @Slf4j
 class EntityConverterManager {
-    /**
-     * Default character set.
-     */
-    final static String DEFAULT_CHARSET = 'ISO-8859-1'
-
     /**
      * List of registered entity converters.
      */
@@ -107,18 +103,17 @@ class EntityConverterManager {
     }
 
     /**
-     * TODO: do I want to keep this this way?
-     * @param entity
-     * @param object
-     * @return
+     * Writes the object from the given entity to an {@link InputStream}.
+     *
+     * @param entity Entity to convert.
+     * @return the entity in an {@link InputStream}.
+     * @throws UnsupportedConversionException
      */
-    InputStream convertHttpEntity(HttpEntity entity, Object object) {
+    InputStream write(ConvertingHttpEntity entity) throws UnsupportedConversionException {
+        Object object = entity.getObject()
         Class<?> type = object.getClass()
 
-        // TODO: where do I want to handle setting defaults?
-        // TODO: need to make sure the character set persists through to the
-        // TODO: ultimate Content-Type
-        String characterSet = entity.getContentType()?.getCharset() ?: 'UTF-8'
+        String characterSet = entity.getContentType()?.getCharset() ?: ContentType.DEFAULT_CHARSET
 
         for (EntityWriter writer : getEntityWriters()) {
             if (writer.supports(type)) {
@@ -145,7 +140,6 @@ class EntityConverterManager {
         }
 
         throw new UnsupportedConversionException(type)
-
     }
 
     /**
@@ -154,11 +148,10 @@ class EntityConverterManager {
      * @param type Object type to attempt conversion to.
      * @param entity Entity input stream.
      * @param contentType Content Type of the entity.
-     * @param charset Character set of the entity.
      * @return The converted object.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    public <T> T read(Class<?> type, InputStream entity, String contentType, String charset) throws UnsupportedConversionException, IOException {
+    public <T> T read(Class<?> type, InputStream entity, ContentType contentType) throws UnsupportedConversionException, IOException {
         if (entity instanceof EntityInputStream && entity.isClosed()) {
             throw new IOException("entity stream is closed")
         }
@@ -166,7 +159,8 @@ class EntityConverterManager {
         for (EntityReader reader : getEntityReaders()) {
             if (reader.supports(type)) {
                 try {
-                    T object = reader.read(entity, contentType, charset) as T
+                    // TODO: make the converters take the content type object?
+                    T object = reader.read(entity, contentType?.type, contentType?.getCharset()) as T
 
                     if (object != null) {
                         return object

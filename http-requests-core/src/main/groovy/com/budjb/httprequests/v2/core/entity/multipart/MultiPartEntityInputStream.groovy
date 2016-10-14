@@ -1,9 +1,7 @@
 package com.budjb.httprequests.v2.core.entity.multipart
 
 import com.budjb.httprequests.v2.core.entity.AbstractHttpEntity
-import com.budjb.httprequests.v2.core.entity.multipart.MultiPartEntityStateMachine.Event
-import com.budjb.httprequests.v2.core.entity.multipart.MultiPartEntityStateMachine.RepeatEvaluationException
-import com.budjb.httprequests.v2.core.entity.multipart.MultiPartEntityStateMachine.State
+import com.budjb.httprequests.v2.util.StateMachine
 
 class MultiPartEntityInputStream extends InputStream {
     MultiPartEntity multiPartEntity
@@ -11,12 +9,12 @@ class MultiPartEntityInputStream extends InputStream {
     /**
      * Entity iterator used during the output phase.
      */
-    protected Iterator<Part> partsIterator
+    protected Iterator<MultiPart> partsIterator
 
     /**
      * Current entity being processed.
      */
-    protected Part currentPart
+    protected MultiPart currentPart
 
     /**
      * Boundary string used to separate entities.
@@ -31,7 +29,7 @@ class MultiPartEntityInputStream extends InputStream {
     /**
      * Output state machine.
      */
-    protected MultiPartEntityStateMachine stateMachine
+    protected StateMachine<State, Event> stateMachine
 
     /**
      * Constructor.
@@ -39,8 +37,9 @@ class MultiPartEntityInputStream extends InputStream {
      * @param boundary
      * @param entities
      */
-    MultiPartEntityInputStream() {
+    MultiPartEntityInputStream(MultiPartEntity entity) {
         stateMachine = createStateMachine()
+        multiPartEntity = entity
     }
 
     /**
@@ -48,13 +47,13 @@ class MultiPartEntityInputStream extends InputStream {
      *
      * @return
      */
-    protected MultiPartEntityStateMachine createStateMachine() {
-        MultiPartEntityStateMachine stateMachine = new MultiPartEntityStateMachine(State.INIT)
+    protected StateMachine createStateMachine() {
+        StateMachine<State, Event> stateMachine = new StateMachine<State, Event>(State.INIT)
 
         stateMachine.from(State.INIT).on(Event.INIT_COMPLETE).to(State.EVALUATE_LOOP_CONDITION)
         stateMachine.from(State.EVALUATE_LOOP_CONDITION).on(Event.START_ENTITY).to(State.BOUNDARY)
-            .on(Event.BOUNDARY_COMPLETE).to(State.HEADERS) // TODO: add this
-            .on(Event.HEADERS_COMPLETE).to(State.STREAM) // TODO: add this
+            .on(Event.BOUNDARY_COMPLETE).to(State.HEADERS)
+            .on(Event.HEADERS_COMPLETE).to(State.STREAM)
             .on(Event.STREAM_COMPLETE).to(State.STREAM_NEWLINE)
             .on(Event.NEWLINE_COMPLETE).to(State.EVALUATE_LOOP_CONDITION)
 
@@ -85,7 +84,7 @@ class MultiPartEntityInputStream extends InputStream {
     int evaluateState() {
         while (true) {
             try {
-                switch (stateMachine.getState()) {
+                switch (stateMachine.getCurrentState()) {
                     case State.INIT:
                         return init()
 
@@ -111,7 +110,7 @@ class MultiPartEntityInputStream extends InputStream {
                         return -1
 
                     default:
-                        throw new IllegalStateException("no execution condition defined for state ${stateMachine.getState().toString()}")
+                        throw new IllegalStateException("no execution condition defined for state ${stateMachine.getCurrentState().toString()}")
                 }
             }
             catch (RepeatEvaluationException ignored) {
@@ -236,5 +235,35 @@ class MultiPartEntityInputStream extends InputStream {
     int readNewline() {
         stateMachine.fire(Event.NEWLINE_COMPLETE)
         return (int) "\n".charAt(0)
+    }
+
+    /**
+     * States of the output state machine.
+     */
+    static enum State {
+        INIT,
+        EVALUATE_LOOP_CONDITION,
+        BOUNDARY,
+        HEADERS,
+        STREAM,
+        STREAM_NEWLINE,
+        LAST_BOUNDARY,
+        DONE
+    }
+
+    static enum Event {
+        INIT_COMPLETE,
+        START_ENTITY,
+        BOUNDARY_COMPLETE,
+        HEADERS_COMPLETE,
+        STREAM_COMPLETE,
+        NEWLINE_COMPLETE,
+        CLOSE
+    }
+
+    static class RepeatEvaluationException extends Exception {
+        RepeatEvaluationException() {
+            super()
+        }
     }
 }

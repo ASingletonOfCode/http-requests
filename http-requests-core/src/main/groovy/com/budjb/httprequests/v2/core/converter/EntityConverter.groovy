@@ -15,4 +15,12 @@
  */
 package com.budjb.httprequests.v2.core.converter
 
-interface EntityConverter {}
+interface EntityConverter {
+    /**
+     * Determines if the reader supports converting an entity to the given class type.
+     *
+     * @param type Type to convert to.
+     * @return Whether the type is supported.
+     */
+    boolean supports(Class<?> type)
+}

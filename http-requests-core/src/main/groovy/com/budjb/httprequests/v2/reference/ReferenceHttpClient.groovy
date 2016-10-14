@@ -15,17 +15,14 @@
  */
 package com.budjb.httprequests.v2.reference
 
-import com.budjb.httprequests.v2.core.AbstractHttpClient
-import com.budjb.httprequests.v2.core.HttpContext
-import com.budjb.httprequests.v2.core.HttpRequest
-import com.budjb.httprequests.v2.core.HttpResponse
+import com.budjb.httprequests.v2.core.*
 import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.util.StreamUtils
 
 import javax.net.ssl.HttpsURLConnection
 
 /**
- * A built-in, basic implementation of an {@link com.budjb.httprequests.core.HttpClient}. This implementation is useful
+ * A built-in, basic implementation of an {@link HttpClient}. This implementation is useful
  * when minimal external dependencies are desired.
  */
 class ReferenceHttpClient extends AbstractHttpClient {
@@ -33,8 +30,9 @@ class ReferenceHttpClient extends AbstractHttpClient {
      * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
+    protected HttpResponse doExecute(HttpContext context) throws IOException {
         HttpRequest request = context.getRequest()
+        HttpEntity entity = request.getEntity()
 
         URI uri = createURI(request)
 

@@ -15,10 +15,10 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
-import com.budjb.httprequests.v2.exception.*
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.exception.*
 import spock.lang.Specification
 import spock.lang.Unroll
 

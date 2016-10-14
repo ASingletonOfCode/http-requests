@@ -1,31 +1,39 @@
 package com.budjb.httprequests.v2.core.entity.multipart
 
-import com.budjb.httprequests.v2.core.entity.AbstractHttpEntity
+import com.budjb.httprequests.v2.core.ContentType
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.entity.ConvertingHttpEntity
 
-class MultiPartEntity extends AbstractHttpEntity {
+abstract class MultiPartEntity extends ConvertingHttpEntity {
     /**
      * Multipart boundary.
      */
     String boundary
 
     /**
+     * Unused.
+     */
+    Object object
+
+    /**
      * List of entities contained in this multi-part.
      */
-    List<Part> parts = []
+    List<MultiPart> parts = []
 
+    /**
+     * Constructor.
+     */
     MultiPartEntity() {
-        this("----------------------${UUID.randomUUID().toString()}")
+        boundary = "----------------------${UUID.randomUUID().toString()}"
+        setInputStream(new MultiPartEntityInputStream(this))
     }
 
     /**
-     * Constructor that takes a boundary.
-     *
-     * @param boundary
+     * {@inheritDoc}
      */
-    MultiPartEntity(String boundary) {
-        super(new MultiPartEntityInputStream(), "multipart/form-data; boundary=${boundary}")
-        ((MultiPartEntityInputStream) getInputStream()).setMultiPartEntity(this)
-        this.boundary = boundary
+    @Override
+    void setContentType(ContentType contentType) {
+        contentType.setParameter('boundary', boundary)
     }
 
     /**
@@ -33,8 +41,21 @@ class MultiPartEntity extends AbstractHttpEntity {
      *
      * @param entity
      */
-    void addPart(Part part) {
+    void addPart(MultiPart part) {
         parts.add(part)
     }
 
+    /**
+     * Converts each part of the multi part entity if necessary.
+     *
+     * @param converterManager
+     */
+    @Override
+    void convert(EntityConverterManager converterManager) {
+        parts.each {
+            if (it instanceof ConvertingHttpEntity) {
+                it.setInputStream(converterManager.write(it))
+            }
+        }
+    }
 }

@@ -17,14 +17,6 @@ package com.budjb.httprequests.v2.core.converter
 
 interface EntityReader extends EntityConverter {
     /**
-     * Determines if the reader supports converting an entity to the given class type.
-     *
-     * @param type Type to convert to.
-     * @return Whether the type is supported.
-     */
-    boolean supports(Class<?> type)
-
-    /**
      * Convert the given entity.
      *
      * If an error occurs, null may be returned so that another converter can attempt a conversion.

@@ -15,6 +15,9 @@
  */
 package com.budjb.httprequests.v2.util
 
+/**
+ * A utility class that provides convenience methods to read/write to/from streams.
+ */
 abstract class StreamUtils {
     /**
      * Reads a <code>String</code> from the given input stream with the given character set.

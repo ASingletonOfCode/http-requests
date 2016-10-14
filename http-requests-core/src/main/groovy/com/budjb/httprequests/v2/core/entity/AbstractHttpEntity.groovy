@@ -41,7 +41,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
      */
     @Override
     void setContentType(String contentType) {
-        setContentType(ContentType.parse(contentType))
+        setContentType(new ContentType(contentType))
     }
 
     /**
@@ -59,6 +59,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
             }
             return buffer
         }
+
         return inputStream
     }
 
@@ -77,6 +78,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
      */
     @Override
     void close() {
-        getInputStream().close()
+        this.inputStream?.close()
+        this.buffer?.close()
     }
 }

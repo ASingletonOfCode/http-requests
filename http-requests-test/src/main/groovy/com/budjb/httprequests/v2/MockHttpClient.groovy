@@ -15,6 +15,7 @@
  */
 package com.budjb.httprequests.v2
 
+import com.budjb.httprequests.v2.core.ContentType
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.AbstractHttpClient
 import com.budjb.httprequests.v2.core.HttpClient
@@ -38,12 +39,7 @@ class MockHttpClient extends AbstractHttpClient {
     /**
      * Content type of the response.
      */
-    String contentType
-
-    /**
-     * Character set of the response.
-     */
-    String charset
+    ContentType contentType
 
     /**
      * HTTP status code of the response.
@@ -77,18 +73,15 @@ class MockHttpClient extends AbstractHttpClient {
      * {@inheritDoc}
      */
     @Override
-    protected HttpResponse doExecute(HttpContext context, HttpEntity entity) throws IOException {
+    protected HttpResponse doExecute(HttpContext context) throws IOException {
         httpContext = context
 
-        if (entity) {
+        HttpEntity entity = context.getRequest().getEntity()
+
+        if (context.getMethod().supportsRequestEntity && entity) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
             transmit(entity.getInputStream(), filterOutputStream(context, outputStream))
             requestBuffer = outputStream.toByteArray()
-        }
-
-        String contentType = this.contentType
-        if (contentType && charset) {
-            contentType += ";charset=${charset}"
         }
 
         return new MockHttpResponse(context.request, converterManager, status, headers, contentType, responseInputStream)

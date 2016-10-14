@@ -3,6 +3,9 @@ package com.budjb.httprequests.v2.core
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
+import com.budjb.httprequests.v2.core.entity.multipart.MultiPart
+import com.budjb.httprequests.v2.core.entity.multipart.MultiPartEntity
+import com.budjb.httprequests.v2.core.entity.multipart.MultiPart
 
 class HttpRequestDelegate {
     /**
@@ -103,7 +106,33 @@ class HttpRequestDelegate {
     }
 
     void multiPartEntity(Closure closure) {
-        // TODO
+        MultiPartHttpEntityDelegate delegate = new MultiPartHttpEntityDelegate()
+
+        closure = (Closure) closure.clone()
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = delegate
+        closure.call()
+
+        httpRequest.setEntity(delegate.build())
+    }
+
+    class MultiPartHttpEntityDelegate {
+        private List<MultiPart> parts = []
+
+        void part(String name, Closure closure) {
+
+        }
+
+        void part(String name, Object object) {
+        }
+
+        void part(String name, InputStream inputStream) {
+
+        }
+
+        MultiPartEntity build() {
+            return null
+        }
     }
 
     class HttpEntityDelegate {
@@ -115,14 +144,14 @@ class HttpRequestDelegate {
         }
 
         void contentType(String contentType) {
-            this.contentType = ContentType.parse(contentType)
+            this.contentType = new ContentType(contentType)
         }
 
         HttpEntity build() {
             HttpEntity entity
 
             if (body instanceof InputStream) {
-                entity = InputStreamHttpEntity(body)
+                entity = new InputStreamHttpEntity((InputStream) body)
             }
             else {
                 entity = new GenericHttpEntity(body)

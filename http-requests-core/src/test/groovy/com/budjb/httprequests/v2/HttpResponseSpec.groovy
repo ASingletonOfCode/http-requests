@@ -15,13 +15,13 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.core.converter.EntityConverterManager
-import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
+import com.budjb.httprequests.v2.core.ContentType
 import com.budjb.httprequests.v2.core.HttpMethod
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class HttpResponseSpec extends Specification {
     def 'When a charset is provided, the resulting string is built using it'() {
@@ -34,8 +34,8 @@ class HttpResponseSpec extends Specification {
             converterManager,
             200,
             [:],
-            'text/plain;charset=euc-jp',
-            new ByteArrayInputStream('åäö'.getBytes())
+            new ContentType('text/plain;charset=euc-jp'),
+            new ByteArrayInputStream('åäö'.getBytes('UTF-8'))
         )
 
         when:
@@ -45,7 +45,7 @@ class HttpResponseSpec extends Specification {
         entity == '奪辰旦'
     }
 
-    def 'When no charset is provided, UTF-8 is used'() {
+    def 'When no charset is provided, ISO-8859-1 is used'() {
         setup:
         EntityConverterManager converterManager = new EntityConverterManager()
         converterManager.add(new StringEntityReader())
@@ -55,7 +55,7 @@ class HttpResponseSpec extends Specification {
             converterManager,
             200,
             [:],
-            'text/plain',
+            new ContentType('text/plain'),
             new ByteArrayInputStream('åäö'.getBytes())
         )
 
@@ -63,7 +63,7 @@ class HttpResponseSpec extends Specification {
         String entity = response.getEntity(String)
 
         then:
-        response.charset == 'UTF-8'
+        !response.contentType.charset
         entity == 'åäö'
     }
 
@@ -114,35 +114,6 @@ class HttpResponseSpec extends Specification {
 
         expect:
         response.getAllow() == [HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT]
-    }
-
-    @Unroll
-    def 'When the content-type is #fullContentType, the content type and character set are parsed properly'() {
-        setup:
-        HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
-            new EntityConverterManager(),
-            200,
-            [:],
-            fullContentType,
-            null
-        )
-
-        expect:
-        response.getContentType() == contentType
-        response.getCharset() == charset
-
-        where:
-        fullContentType                   | contentType  | charset
-        null                              | null         | null
-        ''                                | null         | null
-        'text/plain'                      | 'text/plain' | 'UTF-8'
-        'text/plain;'                     | 'text/plain' | 'UTF-8'
-        'text/plain;charset=foobar'       | 'text/plain' | 'foobar'
-        'text/plain;q=0.9;charset=foobar' | 'text/plain' | 'foobar'
-        'text/plain;q=0.9'                | 'text/plain' | 'UTF-8'
-        'text/plain;charset'              | 'text/plain' | 'UTF-8'
-        'text/plain;charset='             | 'text/plain' | 'UTF-8'
     }
 
     def 'When the response contains no entity, hasEntity() returns false'() {

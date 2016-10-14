@@ -17,18 +17,13 @@ package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.entity.EntityInputStream
-import com.budjb.httprequests.v2.exception.UnsupportedConversionException
+import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import com.budjb.httprequests.v2.util.StreamUtils
 
 /**
  * An object that represents the response of an HTTP request.
  */
 abstract class HttpResponse implements Closeable {
-    /**
-     * Default character set of the response.
-     */
-    private static final DEFAULT_CHARSET = 'UTF-8'
-
     /**
      * The HTTP status of the response.
      */
@@ -37,7 +32,7 @@ abstract class HttpResponse implements Closeable {
     /**
      * Content type of the response.
      */
-    String contentType
+    ContentType contentType
 
     /**
      * Headers of the response.
@@ -48,11 +43,6 @@ abstract class HttpResponse implements Closeable {
      * A list of allowed HTTP methods. Typically returned from OPTIONS requests.
      */
     List<HttpMethod> allow = []
-
-    /**
-     * The character set of the response.
-     */
-    protected String charset
 
     /**
      * Response entity.
@@ -91,37 +81,19 @@ abstract class HttpResponse implements Closeable {
      *
      * @param contentType Content type of the response.
      */
+    void setContentType(ContentType contentType) {
+        this.contentType = contentType
+    }
+
+    /**
+     * Sets the content type of the response.
+     *
+     * @param contentType Content type of the response.
+     */
     void setContentType(String contentType) {
-        if (!contentType) {
-            this.contentType = null
-            this.charset = null
-            return
+        if (contentType) {
+            setContentType(new ContentType(contentType))
         }
-
-        List<String> parts = contentType.tokenize(';')
-
-        this.contentType = parts.remove(0)
-
-        TreeMap<String, String> parameters = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
-        for (String part : parts) {
-            List<String> paramParts = part.tokenize('=').collect { it.trim() }
-
-            String key = paramParts[0]
-            String value = paramParts.size() > 1 ? paramParts[1] : null
-
-            parameters.put(key, value)
-        }
-
-        String charset = DEFAULT_CHARSET
-
-        if (parameters.containsKey('charset')) {
-            String cs = parameters.get('charset')
-            if (cs) {
-                charset = cs
-            }
-        }
-
-        this.charset = charset
     }
 
     /**
@@ -275,7 +247,7 @@ abstract class HttpResponse implements Closeable {
      */
     public <T> T getEntity(Class<T> type) throws UnsupportedConversionException, IOException {
         InputStream entity = getEntity()
-        T object = converterManager.read(type, entity, getContentType(), getCharset())
+        T object = converterManager.read(type, entity, getContentType())
         entity.close()
 
         return object
@@ -322,23 +294,11 @@ abstract class HttpResponse implements Closeable {
      *
      * @return Content-Type of the response.
      */
-    String getContentType() {
+    ContentType getContentType() {
         if (!contentType && headers.containsKey('Content-Type')) {
             setContentType(headers.get('Content-Type').first())
         }
         return contentType
-    }
-
-    /**
-     * Returns the character set of the response.
-     *
-     * @return Character set of the response.
-     */
-    String getCharset() {
-        if (!charset && !contentType && headers.containsKey('Content-Type')) {
-            setContentType(headers.get('Content-Type').first())
-        }
-        return charset
     }
 
     /**

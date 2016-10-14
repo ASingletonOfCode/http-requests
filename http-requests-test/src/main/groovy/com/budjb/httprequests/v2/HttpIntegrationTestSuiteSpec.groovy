@@ -19,12 +19,12 @@ import com.budjb.httprequests.v2.core.FormData
 import com.budjb.httprequests.v2.core.HttpContext
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
-import com.budjb.httprequests.v2.exception.HttpInternalServerErrorException
 import com.budjb.httprequests.v2.core.filter.HttpClientRetryFilter
 import com.budjb.httprequests.v2.core.filter.bundled.BasicAuthFilter
 import com.budjb.httprequests.v2.core.filter.bundled.ConsoleLoggingFilter
 import com.budjb.httprequests.v2.core.filter.bundled.GZIPFilter
 import com.budjb.httprequests.v2.core.filter.bundled.HttpStatusExceptionFilter
+import com.budjb.httprequests.v2.core.exception.HttpInternalServerErrorException
 import com.budjb.httprequests.v2.util.StreamUtils
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Ignore
@@ -329,7 +329,9 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
     def 'Validate builder form of POST with no entity works'() {
         when:
-        def response = httpClientFactory.createHttpClient().post { uri "${baseUrl}/testBasicPost" }
+        def response = httpClientFactory.createHttpClient().post {
+            uri "${baseUrl}/testBasicPost"
+        }
 
         then:
         !response.hasEntity()
@@ -701,12 +703,12 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         def response = httpClientFactory.createHttpClient().post {
             uri "${baseUrl}/acceptContentType"
             accept "text/plain;charset=${charset}"
-            entity input
+            entity input.getBytes('UTF-8')
         }
 
         then:
-        response.contentType == 'text/plain'
-        response.charset == charset
+        response.contentType.type == 'text/plain'
+        response.contentType.charset == charset
         response.getEntity(String) == output
 
         where:
@@ -725,7 +727,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
         then:
         response.getEntity(String) == output
-        response.contentType == contentType
+        response.contentType.type == contentType
 
         when:
         def read = response.getEntity(readType)
