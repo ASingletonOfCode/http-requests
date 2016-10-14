@@ -16,9 +16,8 @@
 package com.budjb.httprequests.v2
 
 import com.budjb.httprequests.v2.core.ContentType
-import com.budjb.httprequests.v2.core.converter.EntityConverterManager
-import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
 /**
  * A standalone {@link HttpResponse} implementation where its properties are injected rather
@@ -35,12 +34,11 @@ class MockHttpResponse extends HttpResponse {
      * @param contentType Content-Type of the response.
      * @param entity Entity of the response.
      */
-    MockHttpResponse(HttpRequest request, EntityConverterManager converterManager, int status, Map<String, Object> headers, ContentType contentType, InputStream entity) {
-        super(request, converterManager)
+    MockHttpResponse(EntityConverterManager converterManager, int status, Map<String, Object> headers, ContentType contentType, InputStream entity) {
+        super(converterManager)
 
         setStatus(status)
         setHeaders(headers)
-        setContentType((ContentType)contentType)
-        setEntity(entity)
+        setEntity(entity, (ContentType)contentType)
     }
 }

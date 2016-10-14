@@ -16,9 +16,9 @@
 package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
-import com.budjb.httprequests.v2.core.entity.EntityInputStream
+import com.budjb.httprequests.v2.core.entity.HttpEntity
+import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
-import com.budjb.httprequests.v2.util.StreamUtils
 
 /**
  * An object that represents the response of an HTTP request.
@@ -28,11 +28,6 @@ abstract class HttpResponse implements Closeable {
      * The HTTP status of the response.
      */
     int status
-
-    /**
-     * Content type of the response.
-     */
-    ContentType contentType
 
     /**
      * Headers of the response.
@@ -47,23 +42,12 @@ abstract class HttpResponse implements Closeable {
     /**
      * Response entity.
      */
-    InputStream entity
-
-    /**
-     * Request properties used to configure the request that generated this response.
-     */
-    HttpRequest request
+    InputStreamHttpEntity entity
 
     /**
      * Converter manager.
      */
-    EntityConverterManager converterManager
-
-    /**
-     * A byte array that contains the entire entity as a buffer. This is only filled when
-     * {@link HttpRequest#bufferResponseEntity} is <code>true</code>.
-     */
-    private byte[] entityBuffer
+    protected EntityConverterManager converterManager
 
     /**
      * Constructor.
@@ -71,29 +55,8 @@ abstract class HttpResponse implements Closeable {
      * @param request Request properties used to make the request.
      * @param converterManager Converter manager.
      */
-    HttpResponse(HttpRequest request, EntityConverterManager converterManager) {
-        this.request = request
+    HttpResponse(EntityConverterManager converterManager) {
         this.converterManager = converterManager
-    }
-
-    /**
-     * Sets the content type of the response.
-     *
-     * @param contentType Content type of the response.
-     */
-    void setContentType(ContentType contentType) {
-        this.contentType = contentType
-    }
-
-    /**
-     * Sets the content type of the response.
-     *
-     * @param contentType Content type of the response.
-     */
-    void setContentType(String contentType) {
-        if (contentType) {
-            setContentType(new ContentType(contentType))
-        }
     }
 
     /**
@@ -117,7 +80,7 @@ abstract class HttpResponse implements Closeable {
      * @param name Name of the header.
      * @param value Value(s) of the header.
      */
-    void setHeader(String name, Object value) {
+    protected void setHeader(String name, Object value) {
         if (!headers.containsKey(name)) {
             headers.put(name, [])
         }
@@ -194,11 +157,21 @@ abstract class HttpResponse implements Closeable {
     /**
      * Sets the entity.
      *
-     * @param inputStream
+     * @param inputStream Input stream containing the entity.
+     * @param contentType Content-Type of the entity.
      */
-    void setEntity(InputStream inputStream) {
+    void setEntity(InputStream inputStream, String contentType) {
+        setEntity(inputStream, new ContentType(contentType))
+    }
+
+    /**
+     * Sets the entity.
+     *
+     * @param inputStream Input stream containing the entity.
+     * @param contentType Content-Type of the entity.
+     */
+    void setEntity(InputStream inputStream, ContentType contentType) {
         entity = null
-        entityBuffer = null
 
         if (inputStream == null) {
             return
@@ -213,29 +186,7 @@ abstract class HttpResponse implements Closeable {
 
         pushBackInputStream.unread(read)
 
-        if (request.isBufferResponseEntity()) {
-            entityBuffer = StreamUtils.readBytes(pushBackInputStream)
-            pushBackInputStream.close()
-        }
-        else {
-            entity = new EntityInputStream(pushBackInputStream)
-        }
-    }
-
-    /**
-     * Returns the entity.
-     *
-     * If the entity was buffered, calling this method will always return a new InputStream.
-     * Otherwise, the original InputStream will be returned. Note that if the entity is not
-     * buffered and it was already read once, subsequent reading will likely fail.
-     *
-     * @return The response entity.
-     */
-    InputStream getEntity() {
-        if (entityBuffer != null) {
-            return new EntityInputStream(new ByteArrayInputStream(entityBuffer))
-        }
-        return entity
+        entity = new InputStreamHttpEntity(pushBackInputStream, (ContentType) contentType)
     }
 
     /**
@@ -246,8 +197,8 @@ abstract class HttpResponse implements Closeable {
      * @throws UnsupportedConversionException when no converter is found to convert the entity.
      */
     public <T> T getEntity(Class<T> type) throws UnsupportedConversionException, IOException {
-        InputStream entity = getEntity()
-        T object = converterManager.read(type, entity, getContentType())
+        HttpEntity entity = getEntity()
+        T object = converterManager.read(type, entity)
         entity.close()
 
         return object
@@ -273,7 +224,7 @@ abstract class HttpResponse implements Closeable {
      * @return Whether the response contains an entity.
      */
     boolean hasEntity() {
-        return entity != null || entityBuffer != null
+        return entity != null
     }
 
     /**
@@ -287,39 +238,5 @@ abstract class HttpResponse implements Closeable {
         }
 
         return allow
-    }
-
-    /**
-     * Returns the Content-Type of the response.
-     *
-     * @return Content-Type of the response.
-     */
-    ContentType getContentType() {
-        if (!contentType && headers.containsKey('Content-Type')) {
-            setContentType(headers.get('Content-Type').first())
-        }
-        return contentType
-    }
-
-    /**
-     * Add a value to the given header name.
-     *
-     * @param key Name of the value.
-     * @param value Value of the header.
-     */
-    void addHeader(String key, String value) {
-        if (!headers.containsKey(key)) {
-            headers.put(key, [])
-        }
-        headers.get(key).add(value)
-    }
-
-    /**
-     * Returns whether the response entity is buffered. If there is no entity, will return <code>false</code>.
-     *
-     * @return Whether the response entity is buffered.
-     */
-    boolean isEntityBuffered() {
-        return entityBuffer != null
     }
 }

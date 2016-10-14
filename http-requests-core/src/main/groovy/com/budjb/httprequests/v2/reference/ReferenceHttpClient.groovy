@@ -82,8 +82,7 @@ class ReferenceHttpClient extends AbstractHttpClient {
             }
         }
 
-
-        return new ReferenceHttpResponse(request, converterManager, connection)
+        return new ReferenceHttpResponse(converterManager, connection)
     }
 
     /**

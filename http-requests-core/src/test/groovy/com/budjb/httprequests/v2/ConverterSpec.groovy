@@ -22,6 +22,7 @@ import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
 import com.budjb.httprequests.v2.core.HttpClient
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.core.entity.HttpEntity
+import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import spock.lang.Specification
 
@@ -50,7 +51,7 @@ class ConverterSpec extends Specification {
         EntityConverterManager converterManager = new EntityConverterManager()
 
         when:
-        converterManager.read(String, new ByteArrayInputStream([1, 2, 3] as byte[]), null)
+        converterManager.read(String, new InputStreamHttpEntity(new ByteArrayInputStream([1, 2, 3] as byte[])))
 
         then:
         thrown UnsupportedConversionException

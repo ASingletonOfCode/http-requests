@@ -179,10 +179,10 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
     protected void logResponseEntity(HttpContext context, StringBuilder stringBuilder) {
         HttpResponse response = context.getResponse()
 
-        InputStream inputStream = response.getEntity()
+        InputStream inputStream = response.getEntity().getInputStream()
 
         if (!inputStream.markSupported()) {
-            inputStream = new BufferedInputStream(response.getEntity(), MAX_ENTITY_LENGTH + 1)
+            inputStream = new BufferedInputStream(inputStream, MAX_ENTITY_LENGTH + 1)
         }
 
         inputStream.mark(MAX_ENTITY_LENGTH + 1)
@@ -202,7 +202,7 @@ abstract class LoggingFilter implements HttpClientRequestEntityFilter, HttpClien
             inputStream.reset()
         }
 
-        response.setEntity(inputStream)
+        response.entity.setInputStream(inputStream)
     }
 
     /**

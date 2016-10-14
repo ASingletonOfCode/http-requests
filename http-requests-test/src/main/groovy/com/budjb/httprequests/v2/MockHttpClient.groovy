@@ -15,12 +15,8 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.core.ContentType
+import com.budjb.httprequests.v2.core.*
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
-import com.budjb.httprequests.v2.core.AbstractHttpClient
-import com.budjb.httprequests.v2.core.HttpClient
-import com.budjb.httprequests.v2.core.HttpContext
-import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.core.filter.HttpClientFilterManager
 
@@ -62,6 +58,16 @@ class MockHttpClient extends AbstractHttpClient {
     HttpContext httpContext
 
     /**
+     * The last {@link HttpRequest} instance used to make a request.
+     */
+    HttpRequest request
+
+    /**
+     * The last {@link HttpResponse} instance returned from a request.
+     */
+    HttpResponse response
+
+    /**
      * Constructor.
      */
     MockHttpClient() {
@@ -76,7 +82,10 @@ class MockHttpClient extends AbstractHttpClient {
     protected HttpResponse doExecute(HttpContext context) throws IOException {
         httpContext = context
 
-        HttpEntity entity = context.getRequest().getEntity()
+        HttpRequest request = context.getRequest()
+        HttpEntity entity = request.getEntity()
+
+        this.request = request
 
         if (context.getMethod().supportsRequestEntity && entity) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
@@ -84,7 +93,9 @@ class MockHttpClient extends AbstractHttpClient {
             requestBuffer = outputStream.toByteArray()
         }
 
-        return new MockHttpResponse(context.request, converterManager, status, headers, contentType, responseInputStream)
+        this.response = new MockHttpResponse(converterManager, status, headers, contentType, responseInputStream)
+
+        return this.response
     }
 
     /**

@@ -7,6 +7,11 @@ import com.budjb.httprequests.v2.core.ContentType
  */
 class InputStreamHttpEntity extends AbstractHttpEntity {
     /**
+     * Buffered input stream source.
+     */
+    private inputStreamBuffer
+
+    /**
      * Builds an {@link HttpEntity} with the given {@link InputStream}.
      *
      * @param inputStream
@@ -23,7 +28,7 @@ class InputStreamHttpEntity extends AbstractHttpEntity {
      */
     InputStreamHttpEntity(InputStream inputStream, ContentType contentType) {
         setInputStream(inputStream)
-        setContentType(contentType)
+        setContentType((ContentType)contentType)
     }
 
     /**
@@ -34,6 +39,6 @@ class InputStreamHttpEntity extends AbstractHttpEntity {
      */
     InputStreamHttpEntity(InputStream inputStream, String contentType) {
         setInputStream(inputStream)
-        setContentType(contentType)
+        setContentType((String)contentType)
     }
 }

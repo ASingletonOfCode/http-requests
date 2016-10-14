@@ -64,12 +64,6 @@ class HttpRequest implements Cloneable {
     boolean followRedirects = true
 
     /**
-     * Whether to buffer the response entity in the {@link HttpResponse} object so that it can be
-     * ready multiple times.
-     */
-    boolean bufferResponseEntity = true
-
-    /**
      * Request entity.
      */
     HttpEntity entity
@@ -448,17 +442,6 @@ class HttpRequest implements Cloneable {
     }
 
     /**
-     * Sets whether to automatically buffer the response entity.
-     *
-     * @param bufferEntity Whether to automatically buffer the response entity.
-     * @return The instance of this class the method was called with.
-     */
-    HttpRequest setBufferResponseEntity(boolean bufferEntity) {
-        this.bufferResponseEntity = bufferEntity
-        return this
-    }
-
-    /**
      * Deep-clone the {@link HttpRequest}.
      *
      * @return A new {@link HttpRequest}.
@@ -468,7 +451,6 @@ class HttpRequest implements Cloneable {
 
         request.setUri(getUri())
         request.setAccept((ContentType) getAccept())
-        request.setBufferResponseEntity(isBufferResponseEntity())
         request.setConnectionTimeout(getConnectionTimeout())
         request.setReadTimeout(getReadTimeout())
         request.setFollowRedirects(isFollowRedirects())
@@ -506,11 +488,23 @@ class HttpRequest implements Cloneable {
         return target
     }
 
+    /**
+     * Sets the entity of the request.
+     *
+     * @param entity Request entity.
+     * @return The instance of this class the method was called with.
+     */
     HttpRequest setEntity(HttpEntity entity) {
         this.entity = entity
         return this
     }
 
+    /**
+     * Sets the entity of the request.
+     *
+     * @param entity Request entity.
+     * @return The instance of this class the method was called with.
+     */
     HttpRequest setEntity(Object entity) {
         if (entity == null) {
             this.entity = null
@@ -521,6 +515,12 @@ class HttpRequest implements Cloneable {
         return this
     }
 
+    /**
+     * Sets the entity of the request.
+     *
+     * @param inputStream Input stream containing the entity.
+     * @return The instance of this class the method was called with.
+     */
     HttpRequest setEntity(InputStream inputStream) {
         this.entity = new InputStreamHttpEntity(inputStream)
         return this

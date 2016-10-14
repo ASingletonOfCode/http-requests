@@ -17,7 +17,7 @@ package com.budjb.httprequests.v2.core.converter
 
 import com.budjb.httprequests.v2.core.ContentType
 import com.budjb.httprequests.v2.core.entity.ConvertingHttpEntity
-import com.budjb.httprequests.v2.core.entity.EntityInputStream
+import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
 
@@ -143,24 +143,25 @@ class EntityConverterManager {
     }
 
     /**
-     * Reads an object from the given entity {@link InputStream}.
+     * Reads an object from the given {@link InputStreamHttpEntity}.
+     *
+     * Due to this method attempting conversion possibly more than once, the entity will be buffered.
      *
      * @param type Object type to attempt conversion to.
      * @param entity Entity input stream.
-     * @param contentType Content Type of the entity.
      * @return The converted object.
      * @throws UnsupportedConversionException when there are no entity writers that support the object type.
      */
-    public <T> T read(Class<?> type, InputStream entity, ContentType contentType) throws UnsupportedConversionException, IOException {
-        if (entity instanceof EntityInputStream && entity.isClosed()) {
-            throw new IOException("entity stream is closed")
-        }
+    public <T> T read(Class<?> type, InputStreamHttpEntity entity) throws UnsupportedConversionException, IOException {
+        entity.buffer()
+
+        InputStream inputStream = entity.getInputStream()
+        ContentType contentType = entity.getContentType()
 
         for (EntityReader reader : getEntityReaders()) {
             if (reader.supports(type)) {
                 try {
-                    // TODO: make the converters take the content type object?
-                    T object = reader.read(entity, contentType?.type, contentType?.getCharset()) as T
+                    T object = reader.read(inputStream, contentType?.type, contentType?.getCharset()) as T
 
                     if (object != null) {
                         return object

@@ -36,13 +36,13 @@ class BundledFilterSpec extends Specification {
         client.addFilter(new GZIPFilter())
 
         when:
-        def response = client.post {
+        client.post {
             entity 'hi there'
             uri 'http://foo.bar.com'
         }
 
         then:
-        response.request.getHeaders().get('Content-Encoding') == ['gzip']
+        client.request.getHeaders().get('Content-Encoding') == ['gzip']
         client.requestBuffer == [31, -117, 8, 0, 0, 0, 0, 0, 0, 0] as byte[]
     }
 
@@ -51,13 +51,13 @@ class BundledFilterSpec extends Specification {
         client.addFilter(new DeflateFilter())
 
         when:
-        def response = client.post {
+        client.post {
             entity 'hi there'
             uri 'http://foo.bar.com'
         }
 
         then:
-        response.request.getHeaders().get('Content-Encoding') == ['deflate']
+        client.request.getHeaders().get('Content-Encoding') == ['deflate']
         client.requestBuffer == [120, -100] as byte[]
     }
 
@@ -68,11 +68,11 @@ class BundledFilterSpec extends Specification {
         client.addFilter(new BasicAuthFilter(username, password))
 
         when:
-        def response = client.get {
+        client.get {
             uri 'http://foo.bar.com'
         }
 
         then:
-        response.request.getHeaders().get('Authorization') == ["Basic " + "$username:$password".getBytes().encodeBase64()]
+        client.request.getHeaders().get('Authorization') == ["Basic " + "$username:$password".getBytes().encodeBase64()]
     }
 }

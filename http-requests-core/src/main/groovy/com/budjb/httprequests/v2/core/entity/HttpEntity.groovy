@@ -35,23 +35,19 @@ interface HttpEntity {
     boolean isBuffered()
 
     /**
-     * Sets whether the entity will be buffered when it is written.
-     *
-     * @param buffered
-     */
-    void setBuffered(boolean buffered)
+     * Buffers the source {@link InputStream} so that it can be read multiple times.
+     ]     */
+    void buffer()
 
     /**
      * Returns the {@link InputStream} containing the entity.
      *
+     * If the entity is buffered, each call to this method will return a new
+     * instance of {@link ByteArrayInputStream}.
+     *
      * @return
      */
     InputStream getInputStream()
-
-    /**
-     * Resets the entity if it is buffered.
-     */
-    void reset()
 
     /**
      * Closes the entity.

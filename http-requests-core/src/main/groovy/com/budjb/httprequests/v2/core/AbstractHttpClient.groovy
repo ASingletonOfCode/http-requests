@@ -262,25 +262,24 @@ abstract class AbstractHttpClient implements HttpClient {
         context.setMethod(method)
 
         if (entity != null) {
+            // It is important that conversion happen now for entities of the ConvertingHttpEntity type.
+            // If this does not happen, the entity's InputStream will most likely not be set, which
+            // will cause failures downstream.
+            if (entity instanceof ConvertingHttpEntity) {
+                entity.convert(getConverterManager())
+            }
+
             // Requests whose client contains a retry filter must have their entity buffered.
             // If it is not, the retried request will either throw an error due to the entity
             // input stream being closed, or the entity will not actually transmit. So, requests
             // that could potentially be retried are automatically read into a ByteArrayInputStream
             // so that it can be transmitted more than once.
             if (filterManager.hasRetryFilters()) {
-                entity.setBuffered(true)
-            }
-
-            if (entity instanceof ConvertingHttpEntity) {
-                entity.convert(getConverterManager())
+                entity.buffer()
             }
         }
 
         while (true) {
-            if (entity != null) {
-                entity.reset()
-            }
-
             HttpRequest newRequest = request.clone() as HttpRequest
             context.setRequest(newRequest)
             context.setResponse(null)

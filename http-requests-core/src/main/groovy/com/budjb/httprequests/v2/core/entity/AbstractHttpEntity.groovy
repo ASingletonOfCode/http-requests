@@ -13,12 +13,6 @@ abstract class AbstractHttpEntity implements HttpEntity {
     ContentType contentType
 
     /**
-     * Whether the entity should be buffered. This is useful for
-     * retransmission.
-     */
-    boolean buffered = false
-
-    /**
      * Input stream containing the entity.
      */
     InputStream inputStream
@@ -26,7 +20,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
     /**
      * Entity buffer.
      */
-    private ByteArrayInputStream buffer
+    private byte[] entityBuffer
 
     /**
      * {@inheritDoc}
@@ -45,6 +39,19 @@ abstract class AbstractHttpEntity implements HttpEntity {
     }
 
     /**
+     * Sets the input stream.
+     *
+     * @param inputStream
+     */
+    void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream
+
+        if (isBuffered()) {
+            entityBuffer = StreamUtils.readBytes(inputStream)
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -54,10 +61,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
         }
 
         if (isBuffered()) {
-            if (buffer == null) {
-                buffer = new ByteArrayInputStream(StreamUtils.readBytes(inputStream))
-            }
-            return buffer
+            return new ByteArrayInputStream(entityBuffer)
         }
 
         return inputStream
@@ -67,18 +71,25 @@ abstract class AbstractHttpEntity implements HttpEntity {
      * {@inheritDoc}
      */
     @Override
-    void reset() {
-        if (isBuffered() && buffer != null) {
-            buffer.reset()
-        }
+    void close() {
+        this.inputStream?.close()
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    void close() {
-        this.inputStream?.close()
-        this.buffer?.close()
+    boolean isBuffered() {
+        return entityBuffer != null
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    void buffer() {
+        if (entityBuffer == null) {
+            entityBuffer = StreamUtils.readBytes(inputStream)
+        }
     }
 }

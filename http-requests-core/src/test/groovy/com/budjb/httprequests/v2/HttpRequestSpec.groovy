@@ -59,14 +59,12 @@ class HttpRequestSpec extends Specification {
             .setSslValidated(false)
             .setReadTimeout(5000)
             .setConnectionTimeout(10000)
-            .setBufferResponseEntity(false)
 
         then:
         request.getAccept().toString().startsWith('text/plain')
         request.getHeaders() == [foo: ['bar', '1', '2'], hi: ['there']]
         request.getQueryParameters() == [foo: ['bar', '1', '2'], hi: ['there']]
         !request.isSslValidated()
-        !request.getBufferResponseEntity()
         request.connectionTimeout == 10000
         request.readTimeout == 5000
         request.uri == 'http://localhost'
@@ -125,7 +123,6 @@ class HttpRequestSpec extends Specification {
             readTimeout 5000
             followRedirects false
             sslValidated false
-            bufferResponseEntity false
             headers([foo: 'bar'])
         }
 
@@ -136,7 +133,6 @@ class HttpRequestSpec extends Specification {
         request.readTimeout == 5000
         !request.followRedirects
         !request.sslValidated
-        !request.bufferResponseEntity
         request.headers == [foo: ['bar']]
         request.queryParameters == [going: ['away']]
     }

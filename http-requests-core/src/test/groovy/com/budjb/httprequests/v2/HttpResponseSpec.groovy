@@ -17,7 +17,6 @@ package com.budjb.httprequests.v2
 
 import com.budjb.httprequests.v2.core.ContentType
 import com.budjb.httprequests.v2.core.HttpMethod
-import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
@@ -30,7 +29,6 @@ class HttpResponseSpec extends Specification {
         converterManager.add(new StringEntityReader())
 
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
             converterManager,
             200,
             [:],
@@ -51,7 +49,6 @@ class HttpResponseSpec extends Specification {
         converterManager.add(new StringEntityReader())
 
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
             converterManager,
             200,
             [:],
@@ -63,14 +60,13 @@ class HttpResponseSpec extends Specification {
         String entity = response.getEntity(String)
 
         then:
-        !response.contentType.charset
+        !response.entity.contentType.charset
         entity == 'åäö'
     }
 
     def 'Verify header parsing and retrieval'() {
         setup:
         def response = new MockHttpResponse(
-            new HttpRequest(),
             new EntityConverterManager(),
             200,
             [
@@ -104,7 +100,6 @@ class HttpResponseSpec extends Specification {
     def 'Ensure the Allow header is parsed properly'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
             new EntityConverterManager(),
             200,
             ['Allow': 'GET,POST,PUT'],
@@ -119,7 +114,6 @@ class HttpResponseSpec extends Specification {
     def 'When the response contains no entity, hasEntity() returns false'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
             new EntityConverterManager(),
             200,
             [:],
@@ -134,7 +128,6 @@ class HttpResponseSpec extends Specification {
     def 'When the response contains an un-buffered input stream, hasEntity() returns true'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity false },
             new EntityConverterManager(),
             200,
             [:],
@@ -149,7 +142,6 @@ class HttpResponseSpec extends Specification {
     def 'When the response contains a byte array entity, hasEntity() returns true'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            HttpRequest.build { bufferResponseEntity true },
             new EntityConverterManager(),
             200,
             [:],

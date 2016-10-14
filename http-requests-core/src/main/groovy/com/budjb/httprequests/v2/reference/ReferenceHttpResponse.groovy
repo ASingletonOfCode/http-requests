@@ -34,13 +34,12 @@ class ReferenceHttpResponse extends HttpResponse {
      * @param request Request properties used to make the request.
      * @param converterManager Converter manager.
      */
-    ReferenceHttpResponse(HttpRequest request, EntityConverterManager converterManager, HttpURLConnection connection) {
-        super(request, converterManager)
+    ReferenceHttpResponse(EntityConverterManager converterManager, HttpURLConnection connection) {
+        super(converterManager)
 
         this.httpURLConnection = connection
 
         setStatus(connection.getResponseCode())
-        setContentType((String)connection.getContentType())
         setHeaders(connection.getHeaderFields())
 
         if (connection.getDoInput()) {
@@ -55,7 +54,7 @@ class ReferenceHttpResponse extends HttpResponse {
                 if (read != -1) {
                     PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream)
                     pushbackInputStream.unread(read)
-                    setEntity(pushbackInputStream)
+                    setEntity(pushbackInputStream, (String)connection.getContentType())
                 }
             }
         }

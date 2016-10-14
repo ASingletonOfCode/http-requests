@@ -629,23 +629,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         response.getEntity(String).startsWith('text/plain')
     }
 
-    def 'When the response is not buffered, the entity can only be retrieved once'() {
-        setup:
-        def response = httpClientFactory.createHttpClient().post {
-            uri "${baseUrl}/testBasicPost"
-            bufferResponseEntity false
-            entity([foo: ['bar', 'baz']])
-        }
-        response.getEntity(Map) == [foo: ['bar', 'baz']]
-
-        when:
-        response.getEntity(String)
-
-        then:
-        thrown IOException
-    }
-
-    def 'When the response is buffered, the entity can be retrieved multiple times'() {
+    def 'When the response entity marshaled, the entity is buffered and can be retrieved multiple times'() {
         setup:
         def response = httpClientFactory.createHttpClient().post {
             uri "${baseUrl}/testBasicPost"
@@ -669,7 +653,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         def response = httpClientFactory.createHttpClient().post(request)
 
         then:
-        StreamUtils.readString(new GZIPInputStream(response.getEntity()), 'UTF-8') == 'Hello, world!'
+        StreamUtils.readString(new GZIPInputStream(response.getEntity().getInputStream()), 'UTF-8') == 'Hello, world!'
     }
 
     def 'Ensure the LoggingFilter does not cause interruptions to HTTP requests.'() {
@@ -707,8 +691,8 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
         }
 
         then:
-        response.contentType.type == 'text/plain'
-        response.contentType.charset == charset
+        response.entity.contentType.type == 'text/plain'
+        response.entity.contentType.charset == charset
         response.getEntity(String) == output
 
         where:
@@ -727,7 +711,7 @@ abstract class HttpIntegrationTestSuiteSpec extends AbstractIntegrationSpec {
 
         then:
         response.getEntity(String) == output
-        response.contentType.type == contentType
+        response.entity.contentType.type == contentType
 
         when:
         def read = response.getEntity(readType)

@@ -27,7 +27,6 @@ class HttpResponseExceptionSpec extends Specification {
     def 'When an HttpResponseException is build with status #status, exception type #type is returned'() {
         setup:
         HttpResponse response = new MockHttpResponse(
-            new HttpRequest(),
             new EntityConverterManager(),
             status,
             [:],
