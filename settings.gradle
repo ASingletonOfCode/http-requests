@@ -1,5 +1,4 @@
-include 'http-requests-bom'
-include 'http-requests-core'
+include 'http-requests'
 include 'http-requests-test'
 include 'http-requests-documentation'
 include 'http-requests-grails'

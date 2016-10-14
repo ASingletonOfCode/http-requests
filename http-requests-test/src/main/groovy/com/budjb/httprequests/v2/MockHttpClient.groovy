@@ -17,6 +17,7 @@ package com.budjb.httprequests.v2
 
 import com.budjb.httprequests.v2.core.*
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.core.filter.HttpClientFilterManager
 

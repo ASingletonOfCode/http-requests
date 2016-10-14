@@ -15,7 +15,7 @@
  */
 package com.budjb.httprequests.v2
 
-import com.budjb.httprequests.v2.core.ContentType
+import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
