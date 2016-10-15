@@ -15,44 +15,28 @@
  */
 package com.budjb.httprequests.v2.core.converter.bundled
 
+import com.budjb.httprequests.v2.core.converter.AbstractEntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityReader
+import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.util.StreamUtils
-
-import java.nio.charset.Charset
 
 /**
  * An entity reader that converts an entity into a String. The character set of the entity is respected.
  */
-class StringEntityReader implements EntityReader {
+class StringEntityReader extends AbstractEntityConverter implements EntityReader {
     /**
-     * Determines if the reader supports converting an entity to the given class type.
-     *
-     * @param type Type to convert to.
-     * @return Whether the type is supported.
+     * {@inheritDoc}
      */
     @Override
-    boolean supports(Class<?> type) {
-        return String.isAssignableFrom(type)
+    protected List<Class<?>> getSupportedTypes() {
+        return [String]
     }
 
     /**
-     * Convert the given entity.
-     *
-     * If an error occurs, null may be returned so that another converter can attempt a conversion.
-     *
-     * @param entity Entity as an {@link InputStream}.
-     * @param contentType Content-Type of the entity.
-     * @param charset Character set of the entity.
-     * @return The converted entity.
-     * @throws Exception when an unexpected error occurs during conversion.
+     * {@inheritDoc}
      */
     @Override
-    Object read(InputStream entity, String contentType, String charset) throws Exception {
-        if (charset) {
-            return StreamUtils.readString(entity, charset)
-        }
-        else {
-            return StreamUtils.readString(entity, Charset.defaultCharset().toString())
-        }
+    Object read(InputStream entity, ContentType contentType) throws Exception {
+        return StreamUtils.readString(entity, contentType?.getCharset() ?: ContentType.DEFAULT_CHARSET)
     }
 }

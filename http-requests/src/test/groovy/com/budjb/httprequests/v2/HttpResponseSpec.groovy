@@ -53,7 +53,7 @@ class HttpResponseSpec extends Specification {
             200,
             [:],
             new ContentType('text/plain'),
-            new ByteArrayInputStream('åäö'.getBytes())
+            new ByteArrayInputStream('åäö'.getBytes('UTF-8'))
         )
 
         when:
@@ -61,7 +61,7 @@ class HttpResponseSpec extends Specification {
 
         then:
         !response.entity.contentType.charset
-        entity == 'åäö'
+        entity == 'Ã¥Ã¤Ã¶'
     }
 
     def 'Verify header parsing and retrieval'() {

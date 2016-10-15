@@ -21,6 +21,10 @@ import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
 
+/**
+ * A container class for {@link EntityConverter} instances. Handles registration
+ * and conversion.
+ */
 @Slf4j
 class EntityConverterManager {
     /**
@@ -112,30 +116,34 @@ class EntityConverterManager {
     InputStream write(ConvertingHttpEntity entity) throws UnsupportedConversionException {
         Object object = entity.getObject()
         Class<?> type = object.getClass()
+        ContentType contentType = entity.getContentType()
 
-        String characterSet = entity.getContentType()?.getCharset() ?: ContentType.DEFAULT_CHARSET
+        List<EntityWriter> writerCandidates = []
+        if (contentType) {
+            writerCandidates.addAll(getEntityWriters().findAll { it.supports(type) && it.supports(contentType) })
+        }
+        writerCandidates.addAll(getEntityWriters().findAll { it.supports(type) })
+        writerCandidates = writerCandidates.unique()
 
-        for (EntityWriter writer : getEntityWriters()) {
-            if (writer.supports(type)) {
-                try {
-                    InputStream inputStream = writer.write(object, characterSet)
+        for (EntityWriter writer : writerCandidates) {
+            try {
+                InputStream inputStream = writer.write(object, contentType)
 
-                    if (inputStream == null) {
-                        continue
-                    }
-
-                    if (entity.getContentType() == null) {
-                        String contentType = writer.getContentType()
-                        if (contentType) {
-                            log.trace("applying Content-Type '${contentType}' to the request")
-                            entity.setContentType(contentType)
-                        }
-                    }
-                    return inputStream
+                if (inputStream == null) {
+                    continue
                 }
-                catch (Exception e) {
-                    log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
+
+                if (contentType == null) {
+                    ContentType newType = writer.getDefaultContentType()
+                    if (newType) {
+                        log.trace("applying Content-Type '${newType}' to the request")
+                        entity.setContentType(newType)
+                    }
                 }
+                return inputStream
+            }
+            catch (Exception e) {
+                log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
             }
         }
 
@@ -158,18 +166,23 @@ class EntityConverterManager {
         InputStream inputStream = entity.getInputStream()
         ContentType contentType = entity.getContentType()
 
-        for (EntityReader reader : getEntityReaders()) {
-            if (reader.supports(type)) {
-                try {
-                    T object = reader.read(inputStream, contentType?.type, contentType?.getCharset()) as T
+        List<EntityReader> readerCandidates = []
+        if (contentType) {
+            readerCandidates.addAll(getEntityReaders().findAll { it.supports(type) && it.supports(contentType) })
+        }
+        readerCandidates.addAll(getEntityReaders().findAll { it.supports(type) })
+        readerCandidates = readerCandidates.unique()
 
-                    if (object != null) {
-                        return object
-                    }
+        for (EntityReader reader : readerCandidates) {
+            try {
+                T object = reader.read(inputStream, contentType) as T
+
+                if (object != null) {
+                    return object
                 }
-                catch (Exception e) {
-                    log.trace("error occurred during conversion with EntityReader ${reader.getClass()}", e)
-                }
+            }
+            catch (Exception e) {
+                log.trace("error occurred during conversion with EntityReader ${reader.getClass()}", e)
             }
         }
 

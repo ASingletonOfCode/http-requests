@@ -15,48 +15,44 @@
  */
 package com.budjb.httprequests.v2.core.converter.bundled
 
+import com.budjb.httprequests.v2.core.converter.AbstractEntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityWriter
+import com.budjb.httprequests.v2.core.entity.ContentType
 import groovy.json.JsonBuilder
 
 /**
  * An entity writer that converts a <code>List</code> or <code>Map</code> into JSON.
  */
-class JsonEntityWriter implements EntityWriter {
+class JsonEntityWriter extends AbstractEntityConverter implements EntityWriter {
     /**
-     * Returns a Content-Type of the converted object that will be set in the HTTP request.
-     *
-     * If no Content-Type is known, null is returned.
-     *
-     * @return Content-Type of the converted object, or null if unknown.
+     * {@inheritDoc}
      */
     @Override
-    String getContentType() {
-        return 'application/json'
+    ContentType getDefaultContentType() {
+        return ContentType.APPLICATION_JSON
     }
 
     /**
-     * Determines whether the given class type is supported by the writer.
-     *
-     * @param type Type to convert.
-     * @return Whether the type is supported.
+     * {@inheritDoc}
      */
     @Override
-    boolean supports(Class<?> type) {
-        return List.isAssignableFrom(type) || Map.isAssignableFrom(type)
+    protected List<ContentType> getSupportedContentTypes() {
+        return [ContentType.APPLICATION_JSON]
     }
 
     /**
-     * Convert the given entity.
-     *
-     * If an error occurs, null may be returned so that another converter may attempt conversion.
-     *
-     * @param entity Entity object to convert into a byte array.
-     * @param characterSet The character set of the request.
-     * @return An {@link InputStream} containing the converted entity.
-     * @throws Exception when an unexpected error occurs.
+     * {@inheritDoc}
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
-        return new ByteArrayInputStream(new JsonBuilder(entity).toString().getBytes(characterSet))
+    protected List<Class<?>> getSupportedTypes() {
+        return [Map, List]
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    InputStream write(Object entity, ContentType contentType) throws Exception {
+        return new ByteArrayInputStream(new JsonBuilder(entity).toString().getBytes(contentType?.getCharset() ?: getSystemCharset()))
     }
 }

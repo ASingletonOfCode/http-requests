@@ -15,12 +15,25 @@
  */
 package com.budjb.httprequests.v2.core.converter
 
+import com.budjb.httprequests.v2.core.entity.ContentType
+
 interface EntityConverter {
     /**
-     * Determines if the reader supports converting an entity to the given class type.
+     * Determines if the converter supports the given class type.
      *
-     * @param type Type to convert to.
+     * @param type Conversion type.
      * @return Whether the type is supported.
      */
     boolean supports(Class<?> type)
+
+    /**
+     * Determines if the converter supports the given Content-Type.
+     *
+     * If a converter does not define a set of supported types, the default
+     * stance should be that the converter supports all content types.
+     *
+     * @param contentType Content-Type.
+     * @return Whether the Content-Type is supported.
+     */
+    boolean supports(ContentType contentType)
 }

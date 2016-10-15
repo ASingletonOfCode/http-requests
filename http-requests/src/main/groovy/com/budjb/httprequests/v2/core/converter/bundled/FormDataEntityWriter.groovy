@@ -16,47 +16,45 @@
 package com.budjb.httprequests.v2.core.converter.bundled
 
 import com.budjb.httprequests.v2.core.FormData
+import com.budjb.httprequests.v2.core.converter.AbstractEntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityWriter
+import com.budjb.httprequests.v2.core.entity.ContentType
 
 /**
  * An entity writer that formats form data.
  */
-class FormDataEntityWriter implements EntityWriter {
+class FormDataEntityWriter extends AbstractEntityConverter implements EntityWriter {
     /**
-     * Returns a Content-Type of the converted object that will be set in the HTTP request.
-     *
-     * If no Content-Type is known, null is returned.
-     *
-     * @return Content-Type of the converted object, or null if unknown.
+     * {@inheritDoc}
      */
     @Override
-    String getContentType() {
-        return 'application/x-www-form-urlencoded'
+    ContentType getDefaultContentType() {
+        return ContentType.APPLICATION_X_WWW_FORM_URLENCODED
     }
 
     /**
-     * Determines whether the given class type is supported by the writer.
-     *
-     * @param type Type to convert.
-     * @return Whether the type is supported.
+     * {@inheritDoc}
      */
     @Override
-    boolean supports(Class<?> type) {
-        return FormData.isAssignableFrom(type)
+    protected List<ContentType> getSupportedContentTypes() {
+        return [ContentType.APPLICATION_X_WWW_FORM_URLENCODED]
     }
 
     /**
-     * Convert the given entity.
-     *
-     * If an error occurs, null may be returned so that another converter may attempt conversion.
-     *
-     * @param entity Entity as an {@link InputStream}.
-     * @param characterSet The character set of the request.
-     * @return The converted object, or null if an error occurs.
-     * @throws Exception when an unexpected error occurs.
+     * {@inheritDoc}
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
+    protected List<Class<?>> getSupportedTypes() {
+        return [FormData]
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    InputStream write(Object entity, ContentType contentType) throws Exception {
+        String characterSet = contentType?.getCharset() ?: getSystemCharset()
+
         if (!(entity instanceof FormData)) {
             return null
         }

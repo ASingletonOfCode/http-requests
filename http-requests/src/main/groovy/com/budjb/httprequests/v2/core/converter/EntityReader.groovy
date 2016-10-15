@@ -15,6 +15,11 @@
  */
 package com.budjb.httprequests.v2.core.converter
 
+import com.budjb.httprequests.v2.core.entity.ContentType
+
+/**
+ * Defines an entity reader.
+ */
 interface EntityReader extends EntityConverter {
     /**
      * Convert the given entity.
@@ -23,9 +28,8 @@ interface EntityReader extends EntityConverter {
      *
      * @param entity Entity as an {@link InputStream}.
      * @param contentType Content-Type of the entity.
-     * @param charset Character set of the entity.
      * @return The converted entity.
      * @throws Exception when an unexpected error occurs during conversion.
      */
-    Object read(InputStream entity, String contentType, String charset) throws Exception
+    Object read(InputStream entity, ContentType contentType) throws Exception
 }

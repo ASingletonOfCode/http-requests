@@ -2,6 +2,9 @@ package com.budjb.httprequests.v2.core.entity
 
 import com.budjb.httprequests.v2.util.StateMachine
 
+/**
+ * Represents a Content-Type and its parameters.
+ */
 class ContentType {
     /**
      * Name of the character set parameter.
@@ -21,19 +24,14 @@ class ContentType {
     static String TOKEN_CHARACTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%^&*\'+-_`{}|~'
 
     /**
-     * Convenience Content-Type for application/octet-stream.
-     */
-    final static ContentType APPLICATION_OCTET_STREAM = new ContentType('application/octet-stream')
-
-    /**
      * Convenience Content-Type for application/json.
      */
     final static ContentType APPLICATION_JSON = new ContentType('application/json')
 
     /**
-     * Convenience Content-Type for text/xml.
+     * Convenience Content-Type for application/octet-stream.
      */
-    final static ContentType TEXT_XML = new ContentType('text/xml')
+    final static ContentType APPLICATION_OCTET_STREAM = new ContentType('application/octet-stream')
 
     /**
      * Convenience Content-Type for application/xml.
@@ -41,9 +39,19 @@ class ContentType {
     final static ContentType APPLICATION_XML = new ContentType('application/xml')
 
     /**
+     * Convenience Content-Type for application/x-www-form-urlencoded.
+     */
+    final static ContentType APPLICATION_X_WWW_FORM_URLENCODED = new ContentType('application/x-www-form-urlencoded')
+
+    /**
      * Convenience Content-Type for text/plain.
      */
     final static ContentType TEXT_PLAIN = new ContentType('text/plain')
+
+    /**
+     * Convenience Content-Type for text/xml.
+     */
+    final static ContentType TEXT_XML = new ContentType('text/xml')
 
     /**
      * Multi-part, form-data.

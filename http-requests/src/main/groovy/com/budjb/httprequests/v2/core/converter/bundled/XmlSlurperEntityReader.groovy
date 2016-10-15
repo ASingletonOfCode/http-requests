@@ -15,37 +15,36 @@
  */
 package com.budjb.httprequests.v2.core.converter.bundled
 
+import com.budjb.httprequests.v2.core.converter.AbstractEntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityReader
+import com.budjb.httprequests.v2.core.entity.ContentType
 import groovy.util.slurpersupport.GPathResult
 
 /**
  * An entity read that parses XML using {@link XmlSlurper}.
  */
-class XmlSlurperEntityReader implements EntityReader {
+class XmlSlurperEntityReader extends AbstractEntityConverter implements EntityReader {
     /**
-     * Determines if the reader supports converting an entity to the given class type.
-     *
-     * @param type Type to convert to.
-     * @return Whether the type is supported.
+     * {@inheritDoc}
      */
     @Override
-    boolean supports(Class<?> type) {
-        return GPathResult.isAssignableFrom(type)
+    protected List<Class<?>> getSupportedTypes() {
+        return [GPathResult]
     }
 
     /**
-     * Convert the given entity.
-     *
-     * If an error occurs, null may be returned so that another converter can attempt a conversion.
-     *
-     * @param entity Entity as an {@link java.io.InputStream}.
-     * @param contentType Content-Type of the entity.
-     * @param charset Character set of the entity.
-     * @return The converted entity.
-     * @throws java.lang.Exception when an unexpected error occurs during conversion.
+     * {@inheritDoc}
      */
     @Override
-    Object read(InputStream entity, String contentType, String charset) throws Exception {
+    protected List<ContentType> getSupportedContentTypes() {
+        return [ContentType.APPLICATION_XML, ContentType.TEXT_XML]
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Object read(InputStream entity, ContentType contentType) throws Exception {
         return new XmlSlurper(false, false).parse(entity)
     }
 }

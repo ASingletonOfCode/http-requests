@@ -15,26 +15,32 @@
  */
 package com.budjb.httprequests.v2.core.converter.bundled
 
+import com.budjb.httprequests.v2.core.converter.AbstractEntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityWriter
+import com.budjb.httprequests.v2.core.entity.ContentType
 
-class ByteArrayEntityWriter implements EntityWriter {
+/**
+ * An entity writer that writes a byte array.
+ */
+class ByteArrayEntityWriter extends AbstractEntityConverter implements EntityWriter {
     /**
-     * Returns a Content-Type of the converted object that will be set in the HTTP request.
-     *
-     * If no Content-Type is known, null is returned.
-     *
-     * @return Content-Type of the converted object, or null if unknown.
+     * {@inheritDoc}
      */
     @Override
-    String getContentType() {
-        return 'application/octet-stream'
+    ContentType getDefaultContentType() {
+        return ContentType.APPLICATION_OCTET_STREAM
     }
 
     /**
-     * Determines whether the given class type is supported by the writer.
-     *
-     * @param type Type to convert.
-     * @return Whether the type is supported.
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Class<?>> getSupportedTypes() {
+        return []
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     boolean supports(Class<?> type) {
@@ -42,17 +48,10 @@ class ByteArrayEntityWriter implements EntityWriter {
     }
 
     /**
-     * Convert the given entity.
-     *
-     * If an error occurs, null may be returned so that another converter may attempt conversion.
-     *
-     * @param entity Entity object to convert into a byte array.
-     * @param characterSet The character set of the request.
-     * @return An {@link InputStream} containing the converted entity.
-     * @throws Exception when an unexpected error occurs.
+     * {@inheritDoc}
      */
     @Override
-    InputStream write(Object entity, String characterSet) throws Exception {
+    InputStream write(Object entity, ContentType contentType) throws Exception {
         return new ByteArrayInputStream(entity as byte[])
     }
 }
