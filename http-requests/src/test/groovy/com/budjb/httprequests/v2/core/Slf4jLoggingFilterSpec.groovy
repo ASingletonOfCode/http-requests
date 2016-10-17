@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
+import com.budjb.httprequests.v2.MockHttpClient
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import com.budjb.httprequests.v2.core.filter.bundled.Slf4jLoggingFilter
 import org.slf4j.Logger

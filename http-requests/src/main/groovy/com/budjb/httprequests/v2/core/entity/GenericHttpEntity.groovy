@@ -1,6 +1,6 @@
 package com.budjb.httprequests.v2.core.entity
 
-class GenericHttpEntity extends ConvertingHttpEntity {
+class GenericHttpEntity extends AutoConvertingHttpEntity {
     /**
      * Object representing the entity.
      */

@@ -103,10 +103,9 @@ class ContentType {
                     if (!isTokenChar(character)) {
                         if (character == '/') {
                             stateMachine.fire(ParserEvent.TYPE_SEPARATOR)
-                            break
                         }
                         else {
-                            throw new IllegalStateException("expected token character but received ")
+                            throw new IllegalArgumentException("expected token character but received '${character}'")
                         }
                     }
                     else {
@@ -118,10 +117,9 @@ class ContentType {
                     if (!isTokenChar(character)) {
                         if (character == ';') {
                             stateMachine.fire(ParserEvent.PARAMETER_SEPARATOR)
-                            break
                         }
                         else {
-                            throw new IllegalStateException("expected token character but received '${character}'")
+                            throw new IllegalArgumentException("expected token character but received '${character}'")
                         }
                     }
                     else {
@@ -137,7 +135,7 @@ class ContentType {
                             key.append(character)
                         }
                         else {
-                            throw new IllegalStateException("expected token character or space but received '${character}'")
+                            throw new IllegalArgumentException("expected token character or space but received '${character}'")
                         }
                     }
                     break
@@ -146,14 +144,12 @@ class ContentType {
                     if (!isTokenChar(character)) {
                         if (character == '=') {
                             stateMachine.fire(ParserEvent.EQUALS)
-                            break
                         }
                         else if (character == ' ') {
                             stateMachine.fire(ParserEvent.WHITE_SPACE)
-                            break
                         }
                         else {
-                            throw new IllegalStateException("expected token character but received '${character}'")
+                            throw new IllegalArgumentException("expected token character but received '${character}'")
                         }
                     }
                     else {
@@ -165,10 +161,9 @@ class ContentType {
                     if (character != ' ') {
                         if (character == '=') {
                             stateMachine.fire(ParserEvent.EQUALS)
-                            break
                         }
                         else {
-                            throw new IllegalStateException("expected space or = character but received '${character}'")
+                            throw new IllegalArgumentException("expected space or = character but received '${character}'")
                         }
                     }
                     break
@@ -177,14 +172,13 @@ class ContentType {
                     if (character != ' ') {
                         if (character == '"') {
                             stateMachine.fire(ParserEvent.QUOTE)
-                            break
                         }
                         else if (isTokenChar(character)) {
                             stateMachine.fire(ParserEvent.TOKEN)
                             value.append(character)
                         }
                         else {
-                            throw new IllegalStateException("expected space, \", or token character but received '${character}'")
+                            throw new IllegalArgumentException("expected space, \", or token character but received '${character}'")
                         }
                     }
                     break
@@ -205,7 +199,10 @@ class ContentType {
                             value = new StringBuilder()
                         }
                         else if (isSpecialChar(character)) {
-                            throw new IllegalStateException("expected token character but got special character '${character}'")
+                            throw new IllegalArgumentException("expected token character but received special character '${character}'")
+                        }
+                        else {
+                            throw new IllegalArgumentException("expected token character but received '${character}'")
                         }
                     }
                     else {
@@ -217,10 +214,9 @@ class ContentType {
                     if (character != ' ') {
                         if (character == ';') {
                             stateMachine.fire(ParserEvent.PARAMETER_SEPARATOR)
-                            break
                         }
                         else {
-                            throw new IllegalStateException("expected ; character but received '${character}'")
+                            throw new IllegalArgumentException("expected ; character but received '${character}'")
                         }
                     }
                     break
@@ -238,7 +234,7 @@ class ContentType {
                         stateMachine.fire(ParserEvent.ESCAPE)
                     }
                     else if (!isTokenChar(character) && !isSpecialChar(character)) {
-                        throw new IllegalStateException("expected token or special character but got '${character}'")
+                        throw new IllegalArgumentException("expected token or special character but received '${character}'")
                     }
                     else {
                         value.append(character)
@@ -247,14 +243,14 @@ class ContentType {
 
                 case ParserState.VALUE_QUOTED_ESCAPE:
                     if (character != '"') {
-                        throw new IllegalStateException("expected \" character but got '${character}'")
+                        throw new IllegalArgumentException("expected \" character but received '${character}'")
                     }
                     value.append(character)
                     stateMachine.fire(ParserEvent.TOKEN)
                     break
 
                 default:
-                    throw new IllegalStateException("invalid state ${stateMachine.getCurrentState().toString()}")
+                    throw new IllegalArgumentException("invalid state ${stateMachine.getCurrentState().toString()}")
             }
         }
 
@@ -268,7 +264,7 @@ class ContentType {
 
         // If the parser state isn't done, the content type is malformed.
         if (stateMachine.getCurrentState() != ParserState.DONE) {
-            throw new IllegalStateException("immature")
+            throw new IllegalArgumentException("content type is malformed")
         }
 
         // Finally set the type.

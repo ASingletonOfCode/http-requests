@@ -1,4 +1,4 @@
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.entity.multipart.InputStreamFormPart

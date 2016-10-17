@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.HttpRequest
+import com.budjb.httprequests.v2.core.entity.ContentType
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -43,7 +44,7 @@ class HttpRequestSpec extends Specification {
         'https://host?f=b=a=r'                      | 'https://host'                      | [f: ['b=a=r']]
     }
 
-    def 'When the builder syntax is used, all properties are set correctly'() {
+    def 'When the fluent builder syntax is used, all properties are set correctly'() {
         setup:
         HttpRequest request = new HttpRequest()
 
@@ -112,28 +113,5 @@ class HttpRequestSpec extends Specification {
         then:
         request.uri == 'https://localhost:12345'
         request.queryParameters == [f: [''], foo: ['bar', 'baz']]
-    }
-
-    def 'When a request is built with the closure builder, the properties are set correctly'() {
-        when:
-        def request = HttpRequest.build {
-            uri 'https://localhost:8080?going=away'
-            accept 'application/json'
-            connectionTimeout 10000
-            readTimeout 5000
-            followRedirects false
-            sslValidated false
-            headers([foo: 'bar'])
-        }
-
-        then:
-        request.uri == 'https://localhost:8080'
-        request.accept.toString().startsWith('application/json')
-        request.connectionTimeout == 10000
-        request.readTimeout == 5000
-        !request.followRedirects
-        !request.sslValidated
-        request.headers == [foo: ['bar']]
-        request.queryParameters == [going: ['away']]
     }
 }

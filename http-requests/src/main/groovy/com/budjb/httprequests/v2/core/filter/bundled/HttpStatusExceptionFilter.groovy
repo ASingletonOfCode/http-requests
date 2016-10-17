@@ -16,8 +16,8 @@
 package com.budjb.httprequests.v2.core.filter.bundled
 
 import com.budjb.httprequests.v2.core.HttpContext
-import com.budjb.httprequests.v2.core.filter.HttpClientLifecycleFilter
 import com.budjb.httprequests.v2.core.exception.HttpStatusException
+import com.budjb.httprequests.v2.core.filter.HttpClientLifecycleFilter
 
 /**
  * A filter that throws an exception specific to an HTTP status if that status is not in the 200-299 range.

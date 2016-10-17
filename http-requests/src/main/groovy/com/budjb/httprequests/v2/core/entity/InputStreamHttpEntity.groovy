@@ -25,7 +25,7 @@ class InputStreamHttpEntity extends AbstractHttpEntity {
      */
     InputStreamHttpEntity(InputStream inputStream, ContentType contentType) {
         setInputStream(inputStream)
-        setContentType((ContentType)contentType)
+        setContentType((ContentType) contentType)
     }
 
     /**
@@ -36,6 +36,6 @@ class InputStreamHttpEntity extends AbstractHttpEntity {
      */
     InputStreamHttpEntity(InputStream inputStream, String contentType) {
         setInputStream(inputStream)
-        setContentType((String)contentType)
+        setContentType((String) contentType)
     }
 }

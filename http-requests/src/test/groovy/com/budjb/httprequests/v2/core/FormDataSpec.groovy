@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.FormData
 import spock.lang.Specification

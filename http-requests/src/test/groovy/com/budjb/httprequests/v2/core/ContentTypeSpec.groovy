@@ -1,4 +1,4 @@
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.core.entity.ContentType
 import spock.lang.Specification
@@ -62,5 +62,40 @@ class ContentTypeSpec extends Specification {
         'text/plain; charset = "UTF-8"'         | 'text/plain' | ['charset': 'UTF-8']
         'text/plain; charset="UTF-8" '          | 'text/plain' | ['charset': 'UTF-8']
         'text/plain; charset="UTF-8" ; q = 2  ' | 'text/plain' | ['charset': 'UTF-8', 'q': '2']
+        'text/plain; charset=UTF-8 ; q = 2  '   | 'text/plain' | ['charset': 'UTF-8', 'q': '2']
+        'text/plain; foo="bar\\"baz"'           | 'text/plain' | ['foo': 'bar"baz']
+
+    }
+
+    @Unroll
+    def 'Validate that the Content-Type #contentType fails to parse'() {
+        when:
+        new ContentType(contentType)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        contentType << [
+            'meh',
+            'foo"/bar',
+            'foo/bar; q !=2',
+            'foo/ bar',
+            'foo/bar/',
+            'foo/"bar"',
+            'foo; q=2',
+            'foo bar',
+            'foo/bar; "charset"="utf-8"',
+            'foo/bar; charset=mid"quote',
+            'foo/bar; foo=[bar]',
+            'foo/bar; foo=',
+            'foo/bar; foo; bar',
+            'foo/bar; foo=bar; hi',
+            'foo/bar; foo=sparkly™',
+            'foo/bar; foo=bar baz',
+            'foo/bar; foo="sparkly™"',
+            'foo/bar; foo="bad\\escape"',
+            'foo/bar; foo'
+        ]
     }
 }

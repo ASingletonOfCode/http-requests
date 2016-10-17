@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
+import com.budjb.httprequests.v2.MockHttpResponse
 import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager

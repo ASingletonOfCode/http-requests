@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2
+package com.budjb.httprequests.v2.core
 
+import com.budjb.httprequests.v2.MockHttpClient
 import com.budjb.httprequests.v2.core.converter.EntityConverter
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.converter.bundled.JsonEntityWriter
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
 import com.budjb.httprequests.v2.core.HttpClient
+import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
@@ -67,5 +70,33 @@ class ConverterSpec extends Specification {
 
         then:
         thrown UnsupportedConversionException
+    }
+
+    def 'When no user-defined Content-Type is specified, the converter manager applies one to the entity'() {
+        setup:
+        EntityConverterManager converterManager = new EntityConverterManager()
+        converterManager.add(new JsonEntityWriter())
+
+        GenericHttpEntity entity = new GenericHttpEntity([foo: 'bar'])
+
+        when:
+        entity.convert(converterManager)
+
+        then:
+        entity.contentType == ContentType.APPLICATION_JSON
+    }
+
+    def 'When a user-defined Content-Type is specified, the converter manager does not apply one to the entity'() {
+        setup:
+        EntityConverterManager converterManager = new EntityConverterManager()
+        converterManager.add(new JsonEntityWriter())
+
+        GenericHttpEntity entity = new GenericHttpEntity([foo: 'bar'], ContentType.TEXT_PLAIN)
+
+        when:
+        entity.convert(converterManager)
+
+        then:
+        entity.contentType == ContentType.TEXT_PLAIN
     }
 }

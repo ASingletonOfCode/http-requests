@@ -2,20 +2,15 @@ package com.budjb.httprequests.v2.core.entity
 
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
-abstract class ConvertingHttpEntity extends AbstractHttpEntity {
+/**
+ * Describes a type of {@link HttpEntity} that supports conversion of its entity body.
+ */
+interface ConvertingHttpEntity extends HttpEntity {
     /**
-     * Returns the object that will be converted.
+     * Provides an {@link EntityConverterManager} to allow the entity to
+     * convert its body as necessary.
      *
-     * @return
+     * @param converterManager An {@link EntityConverterManager} providing conversion functionality.
      */
-    abstract Object getObject()
-
-    /**
-     * Converts the entity and stores it in the entity's {@link InputStream}.
-     *
-     * @param converterManager
-     */
-    void convert(EntityConverterManager converterManager) {
-        setInputStream(converterManager.write(this))
-    }
+    void convert(EntityConverterManager converterManager)
 }

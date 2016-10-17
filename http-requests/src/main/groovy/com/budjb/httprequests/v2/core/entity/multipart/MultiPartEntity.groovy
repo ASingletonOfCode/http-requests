@@ -1,19 +1,15 @@
 package com.budjb.httprequests.v2.core.entity.multipart
 
-import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.entity.AbstractHttpEntity
+import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.entity.ConvertingHttpEntity
 
-abstract class MultiPartEntity extends ConvertingHttpEntity {
+abstract class MultiPartEntity extends AbstractHttpEntity implements ConvertingHttpEntity {
     /**
      * Multipart boundary.
      */
     String boundary
-
-    /**
-     * Unused.
-     */
-    Object object
 
     /**
      * List of entities contained in this multi-part.
@@ -29,20 +25,20 @@ abstract class MultiPartEntity extends ConvertingHttpEntity {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    void setContentType(ContentType contentType) {
-        contentType.setParameter('boundary', boundary)
-    }
-
-    /**
      * Add an entity to the multi-part.
      *
      * @param entity
      */
     void addPart(MultiPart part) {
         parts.add(part)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    void setContentType(ContentType contentType) {
+        contentType.setParameter('boundary', boundary)
     }
 
     /**
@@ -54,7 +50,7 @@ abstract class MultiPartEntity extends ConvertingHttpEntity {
     void convert(EntityConverterManager converterManager) {
         parts.each {
             if (it instanceof ConvertingHttpEntity) {
-                it.setInputStream(converterManager.write(it))
+                it.convert(converterManager)
             }
         }
     }
