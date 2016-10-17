@@ -2,8 +2,8 @@ package com.budjb.httprequests.v2.util
 /**
  * A simple, generic state machine.
  *
- * @param < S >    Type of the state object.
- * @param < E >    Type of the event object.
+ * @param < S >     Type of the state object.
+ * @param < E >     Type of the event object.
  */
 class StateMachine<S, E> {
     /**

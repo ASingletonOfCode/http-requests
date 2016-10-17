@@ -29,9 +29,6 @@ interface EntityConverter {
     /**
      * Determines if the converter supports the given Content-Type.
      *
-     * If a converter does not define a set of supported types, the default
-     * stance should be that the converter supports all content types.
-     *
      * @param contentType Content-Type.
      * @return Whether the Content-Type is supported.
      */

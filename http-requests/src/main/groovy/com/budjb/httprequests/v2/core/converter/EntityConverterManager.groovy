@@ -16,7 +16,7 @@
 package com.budjb.httprequests.v2.core.converter
 
 import com.budjb.httprequests.v2.core.entity.ContentType
-import com.budjb.httprequests.v2.core.entity.ConvertingHttpEntity
+import com.budjb.httprequests.v2.core.entity.HttpEntity
 import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import com.budjb.httprequests.v2.core.exception.UnsupportedConversionException
 import groovy.util.logging.Slf4j
@@ -107,16 +107,28 @@ class EntityConverterManager {
     }
 
     /**
-     * Writes the object from the given entity to an {@link InputStream}.
+     * Writes the given object with the optionally given content type to an {@link HttpEntity}
+     * containing the entity as an {@link InputStream}.
      *
-     * @param entity Entity to convert.
-     * @return the entity in an {@link InputStream}.
+     * @param object Object to convert.
+     * @return the entity with the body contained in an {@link InputStream}.
      * @throws UnsupportedConversionException
      */
-    InputStream write(ConvertingHttpEntity entity) throws UnsupportedConversionException {
-        Object object = entity.getObject()
+    HttpEntity write(Object object) throws UnsupportedConversionException {
+        return write(object, null)
+    }
+
+    /**
+     * Writes the given object with the optionally given content type to an {@link HttpEntity}
+     * containing the entity as an {@link InputStream}.
+     *
+     * @param object Object to convert.
+     * @param contentType Content-Type of the body (optional).
+     * @return the entity with the body contained in an {@link InputStream}.
+     * @throws UnsupportedConversionException
+     */
+    HttpEntity write(Object object, ContentType contentType) throws UnsupportedConversionException {
         Class<?> type = object.getClass()
-        ContentType contentType = entity.getContentType()
 
         List<EntityWriter> writerCandidates = []
         if (contentType) {
@@ -127,24 +139,26 @@ class EntityConverterManager {
 
         for (EntityWriter writer : writerCandidates) {
             try {
-                InputStream inputStream = writer.write(object, contentType)
+                InputStream inputStream = writer.write(object, null)
 
                 if (inputStream == null) {
                     continue
                 }
 
-                if (contentType == null) {
-                    ContentType newType = writer.getDefaultContentType()
-                    if (newType) {
-                        log.trace("applying Content-Type '${newType}' to the request")
-                        entity.setContentType(newType)
-                    }
+                if (contentType != null) {
+                    return new InputStreamHttpEntity(inputStream, contentType)
                 }
-                return inputStream
+                else if (writer.getDefaultContentType()) {
+                    return new InputStreamHttpEntity(inputStream, writer.getDefaultContentType())
+                }
+                else {
+                    return new InputStreamHttpEntity(inputStream)
+                }
             }
             catch (Exception e) {
                 log.trace("error occurred during conversion with EntityWriter ${writer.getClass()}", e)
             }
+
         }
 
         throw new UnsupportedConversionException(type)

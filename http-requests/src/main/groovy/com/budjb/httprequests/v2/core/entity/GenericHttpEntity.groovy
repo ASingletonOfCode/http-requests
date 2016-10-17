@@ -1,6 +1,14 @@
 package com.budjb.httprequests.v2.core.entity
 
-class GenericHttpEntity extends AutoConvertingHttpEntity {
+import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+
+/**
+ * A basic, concrete implementation of an {@link HttpEntity} that supports conversion.
+ *
+ * This class is useful as a general-use entity that will convert some
+ * object for use with an HTTP request.
+ */
+class GenericHttpEntity extends AbstractHttpEntity implements ConvertingHttpEntity {
     /**
      * Object representing the entity.
      */
@@ -35,5 +43,15 @@ class GenericHttpEntity extends AutoConvertingHttpEntity {
     GenericHttpEntity(Object object, ContentType contentType) {
         setObject(object)
         setContentType(contentType)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    void convert(EntityConverterManager converterManager) {
+        HttpEntity entity = converterManager.write(getObject(), getContentType())
+
+        setInputStream(entity.getInputStream())
+        setContentType(entity.getContentType())
     }
 }

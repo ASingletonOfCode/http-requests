@@ -15,7 +15,6 @@
  */
 package com.budjb.httprequests.v2.reference
 
-import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 
@@ -54,7 +53,7 @@ class ReferenceHttpResponse extends HttpResponse {
                 if (read != -1) {
                     PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream)
                     pushbackInputStream.unread(read)
-                    setEntity(pushbackInputStream, (String)connection.getContentType())
+                    setEntity(pushbackInputStream, (String) connection.getContentType())
                 }
             }
         }

@@ -39,13 +39,7 @@ abstract class AbstractEntityConverter implements EntityConverter {
      */
     @Override
     boolean supports(ContentType contentType) {
-        List<ContentType> supported = getSupportedContentTypes()
-
-        if (!supported.size()) {
-            return true
-        }
-
-        return supported.any { it.getType() == contentType.getType() }
+        return getSupportedContentTypes().any { it.getType() == contentType.getType() }
     }
 
     /**
