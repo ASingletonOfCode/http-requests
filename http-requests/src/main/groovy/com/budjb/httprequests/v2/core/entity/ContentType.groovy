@@ -102,7 +102,7 @@ class ContentType {
                 case ParserState.PRIMARY_TYPE:
                     if (!isTokenChar(character)) {
                         if (character == '/') {
-                            stateMachine.fire(ParserEvent.TYPE_SEPARATOR)
+                            fireEvent(contentType, stateMachine, ParserEvent.TYPE_SEPARATOR)
                         }
                         else {
                             throw new IllegalArgumentException("expected token character but received '${character}'")
@@ -116,7 +116,7 @@ class ContentType {
                 case ParserState.SUB_TYPE:
                     if (!isTokenChar(character)) {
                         if (character == ';') {
-                            stateMachine.fire(ParserEvent.PARAMETER_SEPARATOR)
+                            fireEvent(contentType, stateMachine, ParserEvent.PARAMETER_SEPARATOR)
                         }
                         else {
                             throw new IllegalArgumentException("expected token character but received '${character}'")
@@ -129,7 +129,7 @@ class ContentType {
 
                 case ParserState.KEY_LEADING_WHITE_SPACE:
                     if (character != ' ') {
-                        stateMachine.fire(ParserEvent.TOKEN)
+                        fireEvent(contentType, stateMachine, ParserEvent.TOKEN)
 
                         if (isTokenChar(character)) {
                             key.append(character)
@@ -143,10 +143,10 @@ class ContentType {
                 case ParserState.KEY:
                     if (!isTokenChar(character)) {
                         if (character == '=') {
-                            stateMachine.fire(ParserEvent.EQUALS)
+                            fireEvent(contentType, stateMachine, ParserEvent.EQUALS)
                         }
                         else if (character == ' ') {
-                            stateMachine.fire(ParserEvent.WHITE_SPACE)
+                            fireEvent(contentType, stateMachine, ParserEvent.WHITE_SPACE)
                         }
                         else {
                             throw new IllegalArgumentException("expected token character but received '${character}'")
@@ -160,7 +160,7 @@ class ContentType {
                 case ParserState.KEY_ENDING_WHITE_SPACE:
                     if (character != ' ') {
                         if (character == '=') {
-                            stateMachine.fire(ParserEvent.EQUALS)
+                            fireEvent(contentType, stateMachine, ParserEvent.EQUALS)
                         }
                         else {
                             throw new IllegalArgumentException("expected space or = character but received '${character}'")
@@ -171,10 +171,10 @@ class ContentType {
                 case ParserState.VALUE_LEADING_WHITE_SPACE:
                     if (character != ' ') {
                         if (character == '"') {
-                            stateMachine.fire(ParserEvent.QUOTE)
+                            fireEvent(contentType, stateMachine, ParserEvent.QUOTE)
                         }
                         else if (isTokenChar(character)) {
-                            stateMachine.fire(ParserEvent.TOKEN)
+                            fireEvent(contentType, stateMachine, ParserEvent.TOKEN)
                             value.append(character)
                         }
                         else {
@@ -187,10 +187,10 @@ class ContentType {
                     if (!isTokenChar(character)) {
                         if (character == ' ' || character == ';') {
                             if (character == ' ') {
-                                stateMachine.fire(ParserEvent.WHITE_SPACE)
+                                fireEvent(contentType, stateMachine, ParserEvent.WHITE_SPACE)
                             }
                             else {
-                                stateMachine.fire(ParserEvent.PARAMETER_SEPARATOR)
+                                fireEvent(contentType, stateMachine, ParserEvent.PARAMETER_SEPARATOR)
                             }
 
                             parameters.put(key.toString(), value.toString())
@@ -213,7 +213,7 @@ class ContentType {
                 case ParserState.VALUE_ENDING_WHITE_SPACE:
                     if (character != ' ') {
                         if (character == ';') {
-                            stateMachine.fire(ParserEvent.PARAMETER_SEPARATOR)
+                            fireEvent(contentType, stateMachine, ParserEvent.PARAMETER_SEPARATOR)
                         }
                         else {
                             throw new IllegalArgumentException("expected ; character but received '${character}'")
@@ -223,7 +223,7 @@ class ContentType {
 
                 case ParserState.VALUE_QUOTED:
                     if (character == '"') {
-                        stateMachine.fire(ParserEvent.QUOTE)
+                        fireEvent(contentType, stateMachine, ParserEvent.QUOTE)
 
                         parameters.put(key.toString(), value.toString())
 
@@ -231,7 +231,7 @@ class ContentType {
                         value = new StringBuilder()
                     }
                     else if (character == '\\') {
-                        stateMachine.fire(ParserEvent.ESCAPE)
+                        fireEvent(contentType, stateMachine, ParserEvent.ESCAPE)
                     }
                     else if (!isTokenChar(character) && !isSpecialChar(character)) {
                         throw new IllegalArgumentException("expected token or special character but received '${character}'")
@@ -246,11 +246,8 @@ class ContentType {
                         throw new IllegalArgumentException("expected \" character but received '${character}'")
                     }
                     value.append(character)
-                    stateMachine.fire(ParserEvent.TOKEN)
+                    fireEvent(contentType, stateMachine, ParserEvent.TOKEN)
                     break
-
-                default:
-                    throw new IllegalArgumentException("invalid state ${stateMachine.getCurrentState().toString()}")
             }
         }
 
@@ -260,15 +257,27 @@ class ContentType {
         }
 
         // Fire the end string event so that exceptions can occur if necessary.
-        stateMachine.fire(ParserEvent.END_STRING)
-
-        // If the parser state isn't done, the content type is malformed.
-        if (stateMachine.getCurrentState() != ParserState.DONE) {
-            throw new IllegalArgumentException("content type is malformed")
-        }
+        fireEvent(contentType, stateMachine, ParserEvent.END_STRING)
 
         // Finally set the type.
         this.type = "${primaryType.toString()}/${subType.toString()}"
+    }
+
+    /**
+     * Fires an event with the given state machine. If the transition fails, a meaningful exception is returned.
+     *
+     * @param contentType
+     * @param stateMachine
+     * @param event
+     * @throws IllegalArgumentException
+     */
+    protected void fireEvent(String contentType, StateMachine<ParserState, ParserEvent> stateMachine, ParserEvent event) throws IllegalArgumentException {
+        try {
+            stateMachine.fire(event)
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("content type '${contentType}' is malformed", e)
+        }
     }
 
     /**

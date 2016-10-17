@@ -98,4 +98,24 @@ class ContentTypeSpec extends Specification {
             'foo/bar; foo'
         ]
     }
+
+    def 'When building a content type with a character set and null parameters, the character set is set up correctly'() {
+        when:
+        ContentType contentType = new ContentType('text/plain', 'utf-8', null)
+
+        then:
+        contentType.charset == 'utf-8'
+        contentType.parameters == [charset: 'utf-8']
+    }
+
+    def 'Assigning an empty parameter removes it from the content type'() {
+        setup:
+        ContentType contentType = new ContentType('text/plain; charset=utf-8')
+
+        when:
+        contentType.setParameter('charset', '')
+
+        then:
+        contentType.getCharset() == null
+    }
 }
