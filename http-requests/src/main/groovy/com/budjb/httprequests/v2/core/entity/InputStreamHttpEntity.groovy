@@ -4,11 +4,6 @@ package com.budjb.httprequests.v2.core.entity
  */
 class InputStreamHttpEntity extends AbstractHttpEntity {
     /**
-     * Buffered input stream source.
-     */
-    private inputStreamBuffer
-
-    /**
      * Builds an {@link HttpEntity} with the given {@link InputStream}.
      *
      * @param inputStream

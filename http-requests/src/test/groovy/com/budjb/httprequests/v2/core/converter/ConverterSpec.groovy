@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2.core
+package com.budjb.httprequests.v2.core.converter
 
 import com.budjb.httprequests.v2.MockHttpClient
-import com.budjb.httprequests.v2.core.converter.EntityConverter
-import com.budjb.httprequests.v2.core.converter.EntityConverterManager
+import com.budjb.httprequests.v2.core.HttpClient
 import com.budjb.httprequests.v2.core.converter.bundled.JsonEntityWriter
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityWriter
-import com.budjb.httprequests.v2.core.HttpClient
 import com.budjb.httprequests.v2.core.entity.ContentType
 import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
 import com.budjb.httprequests.v2.core.entity.HttpEntity

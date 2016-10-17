@@ -16,8 +16,6 @@
 package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.MockHttpResponse
-import com.budjb.httprequests.v2.core.HttpRequest
-import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
 import com.budjb.httprequests.v2.core.exception.*
 import spock.lang.Specification
@@ -72,6 +70,6 @@ class HttpResponseExceptionSpec extends Specification {
         503    | HttpServiceUnavailableException
         504    | HttpGatewayTimeoutException
         505    | HttpHttpVersionNotSupportedException
-
+        700    | HttpStatusException
     }
 }

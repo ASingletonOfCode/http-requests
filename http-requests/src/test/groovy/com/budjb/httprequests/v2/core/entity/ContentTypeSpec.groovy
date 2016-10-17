@@ -1,6 +1,5 @@
-package com.budjb.httprequests.v2.core
+package com.budjb.httprequests.v2.core.entity
 
-import com.budjb.httprequests.v2.core.entity.ContentType
 import spock.lang.Specification
 import spock.lang.Unroll
 

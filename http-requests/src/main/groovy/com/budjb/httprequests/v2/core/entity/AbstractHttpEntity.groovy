@@ -46,7 +46,8 @@ abstract class AbstractHttpEntity implements HttpEntity {
         this.inputStream = inputStream
 
         if (isBuffered()) {
-            entityBuffer = StreamUtils.readBytes(inputStream)
+            entityBuffer = null
+            buffer()
         }
     }
 
@@ -89,6 +90,7 @@ abstract class AbstractHttpEntity implements HttpEntity {
     void buffer() {
         if (entityBuffer == null) {
             entityBuffer = StreamUtils.readBytes(inputStream)
+            inputStream.close()
         }
     }
 }
