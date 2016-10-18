@@ -219,6 +219,10 @@ class HttpRequestDelegate {
             this.contentType = new ContentType(contentType)
         }
 
+        void contentType(ContentType contentType) {
+            this.contentType = contentType
+        }
+
         HttpEntity build() {
             HttpEntity entity
 

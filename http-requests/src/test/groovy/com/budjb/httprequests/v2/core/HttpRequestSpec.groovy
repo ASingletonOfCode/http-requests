@@ -15,8 +15,8 @@
  */
 package com.budjb.httprequests.v2.core
 
-import com.budjb.httprequests.v2.core.HttpRequest
-import com.budjb.httprequests.v2.core.entity.ContentType
+import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
+import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -28,6 +28,13 @@ class HttpRequestSpec extends Specification {
 
         when:
         HttpRequest request = new HttpRequest(uri)
+
+        then:
+        request.getUri() == parsed
+        request.getQueryParameters() == query
+
+        when:
+        request = new HttpRequest(raw)
 
         then:
         request.getUri() == parsed
@@ -113,5 +120,58 @@ class HttpRequestSpec extends Specification {
         then:
         request.uri == 'https://localhost:12345'
         request.queryParameters == [f: [''], foo: ['bar', 'baz']]
+    }
+
+    def 'Setting an input stream the entity creates an InputStreamHttpEntity'() {
+        setup:
+        InputStream inputStream = new ByteArrayInputStream('hello'.getBytes())
+        HttpRequest request = new HttpRequest()
+
+        when:
+        request.setEntity(inputStream)
+
+        then:
+        request.entity instanceof InputStreamHttpEntity
+        request.entity.inputStream == inputStream
+
+        when:
+        request.setEntity((InputStream)null)
+
+        then:
+        request.entity == null
+    }
+
+    def 'When a request is cloned, all appropriate values are copied'() {
+        setup:
+        HttpRequest request = new HttpRequest()
+        request.uri = 'https://localhost:8080'
+        request.setHeaders([
+            foo: ['bar', 'baz'],
+            hi: 'there'
+        ])
+        request.setQueryParameters([
+            foo: ['bar', 'baz'],
+            hi: 'there'
+        ])
+        request.accept = 'text/plain'
+        request.readTimeout = 1000
+        request.connectionTimeout = 500
+        request.sslValidated = false
+        request.followRedirects = false
+        request.entity = new GenericHttpEntity('hello')
+
+        when:
+        HttpRequest cloned = (HttpRequest)request.clone()
+
+        then:
+        request.uri == cloned.uri
+        request.headers == cloned.headers
+        request.queryParameters == cloned.queryParameters
+        request.accept == cloned.accept
+        request.readTimeout == cloned.readTimeout
+        request.connectionTimeout == cloned.connectionTimeout
+        request.sslValidated == cloned.sslValidated
+        request.followRedirects == cloned.followRedirects
+        request.entity == cloned.entity
     }
 }

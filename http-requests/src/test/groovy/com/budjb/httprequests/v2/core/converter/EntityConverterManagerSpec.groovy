@@ -179,6 +179,34 @@ class EntityConverterManagerSpec extends Specification {
         StreamUtils.readString(entity.getInputStream(), 'utf-8') == 'hello'
     }
 
+    def 'When a charset is provided, the resulting string is built using it'() {
+        setup:
+        EntityConverterManager converterManager = new EntityConverterManager()
+        converterManager.add(new StringEntityReader())
+
+        InputStreamHttpEntity entity = new InputStreamHttpEntity(new ByteArrayInputStream('åäö'.getBytes('UTF-8')), 'text/plain;charset=euc-jp')
+
+        when:
+        String converted = converterManager.read(String, entity)
+
+        then:
+        converted == '奪辰旦'
+    }
+
+    def 'When no charset is provided, ISO-8859-1 is used'() {
+        setup:
+        EntityConverterManager converterManager = new EntityConverterManager()
+        converterManager.add(new StringEntityReader())
+
+        InputStreamHttpEntity entity = new InputStreamHttpEntity(new ByteArrayInputStream('åäö'.getBytes('UTF-8')), 'text/plain')
+
+        when:
+        String converted = converterManager.read(String, entity)
+
+        then:
+        converted == 'Ã¥Ã¤Ã¶'
+    }
+
     static class TrackingStringEntityReader extends AbstractEntityConverter implements EntityReader {
         Closure closure
 

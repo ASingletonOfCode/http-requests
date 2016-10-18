@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.budjb.httprequests.v2.core
+package com.budjb.httprequests.v2.core.filter.bundled
 
 import com.budjb.httprequests.v2.MockHttpClient
 import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader

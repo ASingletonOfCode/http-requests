@@ -53,4 +53,20 @@ class HttpClientFactoryHolder {
         }
         return instance.factory
     }
+
+    /**
+     * Sets the {@link HttpClientFactory} instance in the holder.
+     *
+     * @param factory The {@link HttpClientFactory} to register with the holder.
+     */
+    static void setHttpClientFactory(HttpClientFactory factory) {
+        instance.factory = factory
+    }
+
+    /**
+     * Clears the {@link HttpClientFactory} held in the holder.
+     */
+    static void clear() {
+        instance.factory = null
+    }
 }

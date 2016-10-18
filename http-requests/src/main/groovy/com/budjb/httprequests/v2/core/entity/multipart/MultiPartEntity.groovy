@@ -30,6 +30,7 @@ abstract class MultiPartEntity extends AbstractHttpEntity implements ConvertingH
      * @param entity
      */
     void addPart(MultiPart part) {
+        this.inputStream
         parts.add(part)
     }
 

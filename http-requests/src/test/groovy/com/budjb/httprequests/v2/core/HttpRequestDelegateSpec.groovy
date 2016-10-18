@@ -1,7 +1,8 @@
 package com.budjb.httprequests.v2.core
 
-import com.budjb.httprequests.v2.core.HttpRequest
 import com.budjb.httprequests.v2.core.entity.ContentType
+import com.budjb.httprequests.v2.core.entity.GenericHttpEntity
+import com.budjb.httprequests.v2.core.entity.InputStreamHttpEntity
 import spock.lang.Specification
 
 class HttpRequestDelegateSpec extends Specification {
@@ -57,5 +58,42 @@ class HttpRequestDelegateSpec extends Specification {
         then:
         request.headers == [foo: ['bar', 'baz']]
         request.queryParameters == [foo: ['bar', 'baz']]
+    }
+
+    def 'Creating an entity with a closure creates the entity correctly'() {
+        when:
+        HttpRequest request = HttpRequest.build {
+            uri 'https://localhost:8080'
+            entity {
+                body 'hello'
+                contentType 'text/plain'
+            }
+        }
+
+        then:
+        request.entity instanceof GenericHttpEntity
+        GenericHttpEntity entity = (GenericHttpEntity) request.entity
+        entity.object == 'hello'
+        entity.contentType.type == 'text/plain'
+    }
+
+    def 'Creating an entity with a closure and input stream creates the entity correctly'() {
+        setup:
+        InputStream inputStream = new ByteArrayInputStream('hello'.getBytes())
+
+        when:
+        HttpRequest request = HttpRequest.build {
+            uri 'https://localhost:8080'
+            entity {
+                body inputStream
+                contentType ContentType.APPLICATION_OCTET_STREAM
+            }
+        }
+
+        then:
+        request.entity instanceof InputStreamHttpEntity
+        InputStreamHttpEntity entity = (InputStreamHttpEntity) request.entity
+        entity.inputStream == inputStream
+        entity.contentType.type == 'application/octet-stream'
     }
 }

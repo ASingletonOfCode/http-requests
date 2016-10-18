@@ -16,55 +16,11 @@
 package com.budjb.httprequests.v2.core
 
 import com.budjb.httprequests.v2.MockHttpResponse
-import com.budjb.httprequests.v2.core.entity.ContentType
-import com.budjb.httprequests.v2.core.HttpMethod
-import com.budjb.httprequests.v2.core.HttpResponse
 import com.budjb.httprequests.v2.core.converter.EntityConverterManager
-import com.budjb.httprequests.v2.core.converter.bundled.StringEntityReader
+import com.budjb.httprequests.v2.core.entity.ContentType
 import spock.lang.Specification
 
 class HttpResponseSpec extends Specification {
-    def 'When a charset is provided, the resulting string is built using it'() {
-        setup:
-        EntityConverterManager converterManager = new EntityConverterManager()
-        converterManager.add(new StringEntityReader())
-
-        HttpResponse response = new MockHttpResponse(
-            converterManager,
-            200,
-            [:],
-            new ContentType('text/plain;charset=euc-jp'),
-            new ByteArrayInputStream('åäö'.getBytes('UTF-8'))
-        )
-
-        when:
-        String entity = response.getEntity(String)
-
-        then:
-        entity == '奪辰旦'
-    }
-
-    def 'When no charset is provided, ISO-8859-1 is used'() {
-        setup:
-        EntityConverterManager converterManager = new EntityConverterManager()
-        converterManager.add(new StringEntityReader())
-
-        HttpResponse response = new MockHttpResponse(
-            converterManager,
-            200,
-            [:],
-            new ContentType('text/plain'),
-            new ByteArrayInputStream('åäö'.getBytes('UTF-8'))
-        )
-
-        when:
-        String entity = response.getEntity(String)
-
-        then:
-        !response.entity.contentType.charset
-        entity == 'Ã¥Ã¤Ã¶'
-    }
-
     def 'Verify header parsing and retrieval'() {
         setup:
         def response = new MockHttpResponse(
@@ -96,6 +52,8 @@ class HttpResponseSpec extends Specification {
         response.getHeader('foo') == 'bar'
         response.getHeader('hi') == 'there'
         response.getHeader('peek') == 'boo'
+        response.getHeader('nope') == null
+        response.getHeaders('nope') == null
     }
 
     def 'Ensure the Allow header is parsed properly'() {
@@ -126,7 +84,7 @@ class HttpResponseSpec extends Specification {
         !response.hasEntity()
     }
 
-    def 'When the response contains an un-buffered input stream, hasEntity() returns true'() {
+    def 'When the response contains an entity, hasEntity() returns true'() {
         setup:
         HttpResponse response = new MockHttpResponse(
             new EntityConverterManager(),
@@ -140,17 +98,39 @@ class HttpResponseSpec extends Specification {
         response.hasEntity()
     }
 
-    def 'When the response contains a byte array entity, hasEntity() returns true'() {
+    def 'When an entity is closed, its entity is closed'() {
+        setup:
+        ByteArrayInputStream inputStream = Spy(ByteArrayInputStream, constructorArgs: ['hello'.getBytes()])
+
+        HttpResponse response = new MockHttpResponse(
+            new EntityConverterManager(),
+            200,
+            [:],
+            ContentType.TEXT_PLAIN,
+            inputStream
+        )
+
+        when:
+        response.close()
+
+        then:
+        1 * inputStream.close()
+    }
+
+    def 'Setting the entity with a string content type creates the entity correctly'() {
         setup:
         HttpResponse response = new MockHttpResponse(
             new EntityConverterManager(),
             200,
             [:],
-            null,
-            new ByteArrayInputStream([1, 2, 3] as byte[])
+            ContentType.TEXT_PLAIN,
+            new ByteArrayInputStream('hello'.getBytes())
         )
 
-        expect:
-        response.hasEntity()
+        when:
+        response.setEntity(new ByteArrayInputStream('{"foo":"bar"}'.getBytes()), 'application/json')
+
+        then:
+        response.entity.contentType.type == 'application/json'
     }
 }
